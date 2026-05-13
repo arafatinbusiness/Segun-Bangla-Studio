@@ -1,15 +1,50 @@
 {
   "joy": [
     {
+      "id": "joy/Joy",
+      "name": "Joy",
+      "file": "/music/joy/Joy.mp3",
+      "duration": 30,
+      "category": "Joy"
+    },
+    {
+      "id": "joy/Joy 2",
+      "name": "Joy 2",
+      "file": "/music/joy/Joy 2.mp3",
+      "duration": 30,
+      "category": "Joy"
+    },
+    {
+      "id": "joy/Hope",
+      "name": "Hope",
+      "file": "/music/joy/Hope.mp3",
+      "duration": 30,
+      "category": "Joy"
+    },
+    {
+      "id": "joy/joy4",
+      "name": "Joy 4",
+      "file": "/music/joy/joy4.mp3",
+      "duration": 30,
+      "category": "Joy"
+    },
+    {
+      "id": "joy/Normal Mood",
+      "name": "Normal Mood",
+      "file": "/music/joy/Normal Mood.mp3",
+      "duration": 30,
+      "category": "Joy"
+    },
+    {
       "id": "joy/upbeat-1",
-      "name": "Upbeat Joy",
+      "name": "Upbeat",
       "file": "/music/joy/upbeat-1.mp3",
       "duration": 30,
       "category": "Joy"
     },
     {
       "id": "joy/happy-1",
-      "name": "Happy Melody",
+      "name": "Happy",
       "file": "/music/joy/happy-1.mp3",
       "duration": 30,
       "category": "Joy"
@@ -17,21 +52,63 @@
   ],
   "intense": [
     {
+      "id": "intense/Intense1",
+      "name": "Intense 1",
+      "file": "/music/intense/Intense1.mp3",
+      "duration": 30,
+      "category": "Intense"
+    },
+    {
+      "id": "intense/Intense2",
+      "name": "Intense 2",
+      "file": "/music/intense/Intense2.mp3",
+      "duration": 30,
+      "category": "Intense"
+    },
+    {
+      "id": "intense/Soft_Intense",
+      "name": "Soft Intense",
+      "file": "/music/intense/Soft_Intense.mp3",
+      "duration": 30,
+      "category": "Intense"
+    },
+    {
+      "id": "intense/fscm-productions-decisive-hours-loop",
+      "name": "Decisive Hours",
+      "file": "/music/intense/fscm-productions-decisive-hours-loop.mp3",
+      "duration": 30,
+      "category": "Intense"
+    },
+    {
       "id": "intense/dramatic-1",
-      "name": "Dramatic Tension",
+      "name": "Dramatic",
       "file": "/music/intense/dramatic-1.mp3",
       "duration": 30,
       "category": "Intense"
     },
     {
       "id": "intense/powerful-1",
-      "name": "Powerful Drive",
+      "name": "Powerful",
       "file": "/music/intense/powerful-1.mp3",
       "duration": 30,
       "category": "Intense"
     }
   ],
   "sad": [
+    {
+      "id": "sad/2019-03-17_-_Too_Crazy_-_David_Fesliyan",
+      "name": "Too Crazy",
+      "file": "/music/sad/2019-03-17_-_Too_Crazy_-_David_Fesliyan.mp3",
+      "duration": 30,
+      "category": "Sad"
+    },
+    {
+      "id": "sad/The Pain That Never Felt",
+      "name": "The Pain That Never Felt",
+      "file": "/music/sad/The Pain That Never Felt.mp3",
+      "duration": 30,
+      "category": "Sad"
+    },
     {
       "id": "sad/melancholy-1",
       "name": "Melancholy",

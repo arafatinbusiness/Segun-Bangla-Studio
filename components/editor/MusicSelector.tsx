@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Music, Volume2, Play, Pause } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Music, Volume2, Play, Pause, Loader2 } from 'lucide-react';
 import { useReelEditor } from '@/lib/reelContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -27,6 +27,8 @@ export default function MusicSelector() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [currentAudioId, setCurrentAudioId] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     // Load music metadata
@@ -44,8 +46,89 @@ export default function MusicSelector() {
       });
   }, []);
 
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const handlePlayPreview = (track: MusicTrack, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent selecting when clicking play
+    
+    if (currentAudioId === track.id && audioRef.current) {
+      // Toggle play/pause for current track
+      if (audioRef.current.paused) {
+        audioRef.current.play();
+        setPlaying(true);
+      } else {
+        audioRef.current.pause();
+        setPlaying(false);
+      }
+      return;
+    }
+
+    // Stop current audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+
+    // Play new track
+    const audio = new Audio(track.file);
+    audio.volume = 0.5;
+    audio.onended = () => {
+      setPlaying(false);
+      setCurrentAudioId(null);
+    };
+    audio.onerror = () => {
+      console.error('Failed to play audio:', track.file);
+      setPlaying(false);
+      setCurrentAudioId(null);
+    };
+    audio.play().then(() => {
+      setPlaying(true);
+      setCurrentAudioId(track.id);
+    }).catch((err) => {
+      console.error('Audio play error:', err);
+      setPlaying(false);
+      setCurrentAudioId(null);
+    });
+    audioRef.current = audio;
+  };
+
+  const handleSelectMusic = (musicId: string) => {
+    if (!reel) return;
+    dispatch({
+      type: 'UPDATE_MUSIC',
+      payload: {
+        musicId,
+        volume: reel.musicVolume,
+      },
+    });
+  };
+
+  const handleVolumeChange = (volume: number[]) => {
+    if (!reel) return;
+    dispatch({
+      type: 'UPDATE_MUSIC',
+      payload: {
+        musicId: reel.musicId,
+        volume: volume[0],
+      },
+    });
+  };
+
   if (!reel || loading) {
-    return <p className="text-xs text-muted-foreground">Loading music library...</p>;
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+        <p className="text-xs text-muted-foreground ml-2">Loading music library...</p>
+      </div>
+    );
   }
 
   if (!musicData) {
@@ -57,26 +140,6 @@ export default function MusicSelector() {
   const tracks = musicData[currentCategory] || [];
 
   const currentTrack = tracks.find((t) => t.id === reel.musicId);
-
-  const handleSelectMusic = (musicId: string) => {
-    dispatch({
-      type: 'UPDATE_MUSIC',
-      payload: {
-        musicId,
-        volume: reel.musicVolume,
-      },
-    });
-  };
-
-  const handleVolumeChange = (volume: number[]) => {
-    dispatch({
-      type: 'UPDATE_MUSIC',
-      payload: {
-        musicId: reel.musicId,
-        volume: volume[0],
-      },
-    });
-  };
 
   return (
     <div className="space-y-4">
@@ -106,25 +169,44 @@ export default function MusicSelector() {
 
       {/* Tracks List */}
       <div className="space-y-2">
-        {tracks.map((track) => (
-          <Card
-            key={track.id}
-            className={`p-2 border cursor-pointer transition ${
-              reel.musicId === track.id
-                ? 'border-primary bg-primary/10'
-                : 'border-border bg-muted/30 hover:bg-muted/50'
-            }`}
-            onClick={() => handleSelectMusic(track.id)}
-          >
-            <div className="flex items-start gap-2">
-              <Music className="w-3 h-3 mt-1 flex-shrink-0 text-primary" />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-foreground truncate">{track.name}</p>
-                <p className="text-xs text-muted-foreground">{track.duration}s</p>
+        {tracks.map((track) => {
+          const isSelected = reel.musicId === track.id;
+          const isPlaying = currentAudioId === track.id && playing;
+          
+          return (
+            <Card
+              key={track.id}
+              className={`p-2 border cursor-pointer transition ${
+                isSelected
+                  ? 'border-primary bg-primary/10'
+                  : 'border-border bg-muted/30 hover:bg-muted/50'
+              }`}
+              onClick={() => handleSelectMusic(track.id)}
+            >
+              <div className="flex items-start gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-6 h-6 flex-shrink-0 mt-0.5"
+                  onClick={(e) => handlePlayPreview(track, e)}
+                >
+                  {isPlaying ? (
+                    <Pause className="w-3 h-3 text-primary" />
+                  ) : (
+                    <Play className="w-3 h-3 text-primary" />
+                  )}
+                </Button>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-foreground truncate">{track.name}</p>
+                  <p className="text-xs text-muted-foreground">{track.duration}s</p>
+                </div>
+                {isSelected && (
+                  <Music className="w-3 h-3 mt-1 flex-shrink-0 text-primary" />
+                )}
               </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
       </div>
 
       {/* Volume Control */}
