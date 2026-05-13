@@ -1,22 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import { useReelEditor } from '@/lib/reelContext';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { getTemplateList } from '@/lib/templates';
 import { TemplateType } from '@/lib/types';
 import TemplateSelector from './TemplateSelector';
 import { Palette } from 'lucide-react';
@@ -28,9 +17,6 @@ interface RightSettingsPanelProps {
 export default function RightSettingsPanel({ onPreviewUpdate }: RightSettingsPanelProps) {
   const { state, dispatch } = useReelEditor();
   const reel = state.reel;
-  const [activeTab, setActiveTab] = useState('text');
-  const [rendering, setRendering] = useState(false);
-  const [renderStatus, setRenderStatus] = useState<string | null>(null);
 
   if (!reel) {
     return (
@@ -58,79 +44,6 @@ export default function RightSettingsPanel({ onPreviewUpdate }: RightSettingsPan
   const handleDurationChange = (value: number[]) => {
     dispatch({ type: 'UPDATE_DURATION', payload: value[0] });
     onPreviewUpdate();
-  };
-
-  const handlePreview = () => {
-    // Force preview update by changing key
-    onPreviewUpdate();
-  };
-
-  const handleRender = async () => {
-    if (!reel) return;
-    
-    setRendering(true);
-    setRenderStatus('Generating video...');
-    
-    try {
-      // Call render API (no Firestore dependency)
-      const response = await fetch('/api/render/start', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          articleId: reel.articleId,
-          template: reel.template,
-          title: reel.title,
-          headlineText: reel.headlineText,
-          subtitleText: reel.subtitleText,
-          duration: reel.duration,
-          musicId: reel.musicId,
-          musicVolume: reel.musicVolume,
-          images: reel.images,
-        }),
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setRenderStatus('Video ready!');
-        
-        // Take a screenshot of the preview for download
-        const previewEl = document.querySelector('.preview-container') as HTMLElement;
-        if (previewEl) {
-          // Use canvas to capture preview as image
-          const canvas = document.createElement('canvas');
-          const rect = previewEl.getBoundingClientRect();
-          canvas.width = rect.width * 2;
-          canvas.height = rect.height * 2;
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.scale(2, 2);
-            // Draw a simple representation
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, rect.width, rect.height);
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 24px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(reel.headlineText || 'Segun Bangla', rect.width / 2, rect.height / 2);
-            
-            // Trigger download
-            const link = document.createElement('a');
-            link.download = `segun-bangla-${reel.articleId}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-          }
-        }
-      } else {
-        setRenderStatus(`Error: ${data.error || 'Failed to render'}`);
-      }
-    } catch (error) {
-      console.error('Render error:', error);
-      setRenderStatus('Failed to render. Check console.');
-    } finally {
-      setRendering(false);
-    }
   };
 
   return (
@@ -349,26 +262,6 @@ export default function RightSettingsPanel({ onPreviewUpdate }: RightSettingsPan
             </CardContent>
           </Card>
 
-          {/* Action Buttons */}
-          <div className="space-y-2 sticky bottom-4">
-            <Button
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-              onClick={handlePreview}
-            >
-              Preview
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full border-primary text-primary hover:bg-primary/10"
-              onClick={handleRender}
-              disabled={rendering}
-            >
-              {rendering ? 'Exporting...' : 'Export Video'}
-            </Button>
-            {renderStatus && (
-              <p className="text-xs text-center text-muted-foreground mt-2">{renderStatus}</p>
-            )}
-          </div>
         </div>
       </ScrollArea>
     </div>
