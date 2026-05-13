@@ -101,9 +101,8 @@ export default function TopToolbar({ article }: TopToolbarProps) {
       const fps = 30;
       const totalFrames = reel.duration * fps;
       
-      // Scene timing (matches Remotion photocard design)
-      const headlineEndFrame = 2 * fps;           // 0-2s: Headline scene
-      const imageStartFrame = headlineEndFrame;     // 2s onwards: Image scenes
+      // Scene timing - photocard style from the start
+      const imageStartFrame = 0;                    // Start with photocard immediately
       const outroStartFrame = (reel.duration - 2) * fps; // Last 2s: Branding outro
       
       showStatus('preparing', `Loading images & audio...${selectedMusicName ? ` (${selectedMusicName})` : ''}`, 10);
@@ -210,35 +209,7 @@ export default function TopToolbar({ article }: TopToolbarProps) {
         ctx.fillStyle = template.colors.background;
         ctx.fillRect(0, 0, 1080, 1920);
         
-        // === SCENE 1: HEADLINE (0-2s) ===
-        if (frame < headlineEndFrame) {
-          // Fade in + scale animation
-          const opacity = Math.min(1, frame / 15);
-          const scale = 0.9 + (Math.min(1, frame / 20) * 0.1);
-          
-          ctx.save();
-          ctx.globalAlpha = opacity;
-          ctx.translate(540, 960);
-          ctx.scale(scale, scale);
-          
-          // Headline text
-          ctx.fillStyle = template.colors.text;
-          ctx.font = `bold ${template.typography.headlineSize}px sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          
-          const lines = wrapText(ctx, reel.headlineText || 'Segun Bangla', 1000, template.typography.headlineSize);
-          const lineHeight = template.typography.headlineSize * 1.3;
-          const startY = -((lines.length - 1) * lineHeight) / 2;
-          
-          lines.forEach((line, i) => {
-            ctx.fillText(line, 0, startY + (i * lineHeight));
-          });
-          
-          ctx.restore();
-        }
-        
-        // === SCENE 2: IMAGE WITH OVERLAY (2s to end-2s) ===
+        // === PHOTOCARD SCENE: Image with bottom card (full duration except outro) ===
         if (frame >= imageStartFrame && frame < outroStartFrame) {
           const imageFrame = frame - imageStartFrame;
           const imageDuration = outroStartFrame - imageStartFrame;
@@ -356,14 +327,14 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             ctx.textBaseline = 'top';
             ctx.fillText('বিশেষ', 40, cardY + 30);
             
-            // Caption text in card (per-image caption) - dynamic color
+            // Caption text in card (per-image caption) - dynamic color - larger heading
             ctx.fillStyle = reel.bottomTextColor || '#FFFFFF';
-            ctx.font = `bold 48px sans-serif`;
+            ctx.font = `bold 64px sans-serif`;
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             
-            const captionLines = wrapText(ctx, imageCaption, 1000, 48);
-            const hlLineHeight = 62;
+            const captionLines = wrapText(ctx, imageCaption, 1000, 64);
+            const hlLineHeight = 82;
             const hlStartY = cardY + 80;
             
             captionLines.forEach((line, i) => {
