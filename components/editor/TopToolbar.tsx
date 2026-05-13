@@ -245,11 +245,16 @@ export default function TopToolbar({ article }: TopToolbarProps) {
           
           // Draw image if available
           if (loadedImages.length > 0) {
-            const imgIndex = 0; // Use first image for now
+            // Determine which image to show based on frame position
+            // For now use first image, but we can extend to cycle through images
+            const imgIndex = 0;
             const img = loadedImages[imgIndex];
             
             // Get image animation from reel config
             const animation = reel.images[imgIndex]?.animation || 'zoom';
+            
+            // Get per-image caption, fallback to article headline
+            const imageCaption = reel.images[imgIndex]?.caption || reel.headlineText || 'Segun Bangla';
             
             // Apply animation
             ctx.save();
@@ -325,28 +330,19 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             ctx.textBaseline = 'top';
             ctx.fillText('বিশেষ', 40, cardY + 30);
             
-            // Headline text in card
+            // Caption text in card (per-image caption)
             ctx.fillStyle = '#FFFFFF';
             ctx.font = `bold 48px sans-serif`;
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             
-            const headlineLines = wrapText(ctx, reel.headlineText || 'Segun Bangla', 1000, 48);
+            const captionLines = wrapText(ctx, imageCaption, 1000, 48);
             const hlLineHeight = 62;
             const hlStartY = cardY + 80;
             
-            headlineLines.forEach((line, i) => {
+            captionLines.forEach((line, i) => {
               ctx.fillText(line, 40, hlStartY + (i * hlLineHeight));
             });
-            
-            // Subtitle in card
-            if (reel.subtitleText) {
-              ctx.fillStyle = '#AAAAAA';
-              ctx.font = '26px sans-serif';
-              ctx.textAlign = 'left';
-              ctx.textBaseline = 'top';
-              ctx.fillText(reel.subtitleText, 40, hlStartY + (headlineLines.length * hlLineHeight) + 10);
-            }
             
             // === TEAL BOTTOM BAR (like TV news channel) ===
             const barHeight = 60;

@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Trash2, Upload, Clock, Wand2 } from 'lucide-react';
+import { Trash2, Upload, Clock, Wand2, MessageSquareText } from 'lucide-react';
 import { useReelEditor } from '@/lib/reelContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -33,6 +34,7 @@ export default function ImageManager() {
         duration: 5,
         animation: 'zoom',
         position: reel.images.length,
+        caption: '',
       };
       dispatch({ type: 'ADD_IMAGE', payload: newImage });
       setImageUrl('');
@@ -59,6 +61,16 @@ export default function ImageManager() {
       dispatch({
         type: 'UPDATE_IMAGE',
         payload: { ...image, animation },
+      });
+    }
+  };
+
+  const handleUpdateImageCaption = (id: string, caption: string) => {
+    const image = reel.images.find((img) => img.id === id);
+    if (image) {
+      dispatch({
+        type: 'UPDATE_IMAGE',
+        payload: { ...image, caption },
       });
     }
   };
@@ -115,6 +127,24 @@ export default function ImageManager() {
                 <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
                   Image not found
                 </div>
+              </div>
+
+              {/* Caption Input */}
+              <div className="mb-3">
+                <Label className="text-xs flex items-center gap-1 mb-1">
+                  <MessageSquareText className="w-3 h-3" />
+                  Caption for this image
+                </Label>
+                <Textarea
+                  value={image.caption || ''}
+                  onChange={(e) => handleUpdateImageCaption(image.id, e.target.value)}
+                  placeholder="Enter caption for this image..."
+                  className="text-xs min-h-[60px] resize-none"
+                  rows={2}
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  This caption will appear in the bottom card when this image is shown
+                </p>
               </div>
 
               {/* Duration Slider */}

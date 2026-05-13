@@ -23,8 +23,10 @@ export interface ReelImage {
   duration: number; // seconds on screen
   animation: 'zoom' | 'pan' | 'fade' | 'none';
   position: number; // order in timeline
+  caption?: string; // per-image caption text
   uploadedAt?: string;
 }
+
 
 // Reel configuration
 export interface ReelConfig {
