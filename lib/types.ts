@@ -53,6 +53,7 @@ export interface ReelConfig {
   bottomCardColor: string; // solid color for bottom text card (e.g. '#1a1a2e')
   bottomBarColor: string; // color for bottom teal bar (e.g. '#0D9488')
   bottomTextColor: string; // color for caption text in bottom card (e.g. '#FFFFFF')
+  detailsStartTime: number; // seconds after which article details appear (default 6)
   createdAt: string;
   updatedAt: string;
   createdBy: string;

@@ -23,6 +23,7 @@ type ReelEditorAction =
   | { type: 'UPDATE_BOTTOM_CARD_COLOR'; payload: string }
   | { type: 'UPDATE_BOTTOM_BAR_COLOR'; payload: string }
   | { type: 'UPDATE_BOTTOM_TEXT_COLOR'; payload: string }
+  | { type: 'UPDATE_DETAILS_START_TIME'; payload: number }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'RESET' };
@@ -184,6 +185,18 @@ function reelReducer(state: ReelEditorState, action: ReelEditorAction): ReelEdit
           ? {
               ...state.reel,
               bottomTextColor: action.payload,
+              updatedAt: new Date().toISOString(),
+            }
+          : null,
+      };
+
+    case 'UPDATE_DETAILS_START_TIME':
+      return {
+        ...state,
+        reel: state.reel
+          ? {
+              ...state.reel,
+              detailsStartTime: action.payload,
               updatedAt: new Date().toISOString(),
             }
           : null,

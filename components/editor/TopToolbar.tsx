@@ -101,8 +101,8 @@ export default function TopToolbar({ article }: TopToolbarProps) {
       const fps = 30;
       const totalFrames = reel.duration * fps;
       
-      // Scene timing - photocard style from the start
-      const imageStartFrame = 0;                    // Start with photocard immediately
+      // Scene timing
+      const detailsStartFrame = (reel.detailsStartTime || 6) * fps; // Show article details after this time
       const outroStartFrame = (reel.duration - 2) * fps; // Last 2s: Branding outro
       
       showStatus('preparing', `Loading images & audio...${selectedMusicName ? ` (${selectedMusicName})` : ''}`, 10);
@@ -209,10 +209,10 @@ export default function TopToolbar({ article }: TopToolbarProps) {
         ctx.fillStyle = template.colors.background;
         ctx.fillRect(0, 0, 1080, 1920);
         
-        // === PHOTOCARD SCENE: Image with bottom card (full duration except outro) ===
-        if (frame >= imageStartFrame && frame < outroStartFrame) {
-          const imageFrame = frame - imageStartFrame;
-          const imageDuration = outroStartFrame - imageStartFrame;
+        // === PHOTOCARD SCENE: Image with bottom card (from start until details or outro) ===
+        if (frame >= 0 && frame < detailsStartFrame) {
+          const imageFrame = frame;
+          const imageDuration = detailsStartFrame;
           
           // Draw image if available
           if (loadedImages.length > 0) {
@@ -391,7 +391,75 @@ export default function TopToolbar({ article }: TopToolbarProps) {
           }
         }
         
-        // === SCENE 3: BRANDING OUTRO (last 2s) ===
+        // === ARTICLE DETAILS SCENE (from detailsStartTime until outro) ===
+        if (frame >= detailsStartFrame && frame < outroStartFrame) {
+          const detailsFrame = frame - detailsStartFrame;
+          const detailsDuration = outroStartFrame - detailsStartFrame;
+          
+          // Dark background
+          ctx.fillStyle = '#0a0a1a';
+          ctx.fillRect(0, 0, 1080, 1920);
+          
+          // Top accent line
+          ctx.fillStyle = '#FF0000';
+          ctx.fillRect(0, 0, 1080, 4);
+          
+          // Headline at top
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 56px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          
+          const headlineLines = wrapText(ctx, reel.headlineText || 'Segun Bangla', 1000, 56);
+          const headlineLineHeight = 72;
+          const headlineStartY = 60;
+          
+          headlineLines.slice(0, 2).forEach((line, i) => {
+            ctx.fillText(line, 540, headlineStartY + (i * headlineLineHeight));
+          });
+          
+          // Separator line
+          ctx.fillStyle = '#FF0000';
+          ctx.fillRect(80, headlineStartY + (Math.min(headlineLines.length, 2) * headlineLineHeight) + 30, 920, 2);
+          
+          // Article content (max 4 lines)
+          const contentText = article.content || article.excerpt || reel.subtitleText || '';
+          ctx.fillStyle = '#CCCCCC';
+          ctx.font = '36px sans-serif';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'top';
+          
+          const contentStartY = headlineStartY + (Math.min(headlineLines.length, 2) * headlineLineHeight) + 60;
+          const contentLines = wrapText(ctx, contentText, 920, 36);
+          const contentLineHeight = 52;
+          
+          // Show max 4 lines
+          const maxContentLines = Math.min(contentLines.length, 4);
+          for (let i = 0; i < maxContentLines; i++) {
+            ctx.fillText(contentLines[i], 80, contentStartY + (i * contentLineHeight));
+          }
+          
+          // Bottom bar (same as photocard)
+          const barHeight = 60;
+          const barY = 1920 - barHeight;
+          const barColor = reel.bottomBarColor || '#0D9488';
+          ctx.fillStyle = barColor;
+          ctx.fillRect(0, barY, 1080, barHeight);
+          ctx.fillStyle = lightenColor(barColor, 30);
+          ctx.fillRect(0, barY, 1080, 2);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 22px sans-serif';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('সেগুন বাংলা', 30, barY + barHeight / 2);
+          ctx.fillStyle = '#CCFBF1';
+          ctx.font = '18px sans-serif';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('@segunbangla', 1050, barY + barHeight / 2);
+        }
+        
+        // === BRANDING OUTRO (last 2s) ===
         if (frame >= outroStartFrame) {
           const outroFrame = frame - outroStartFrame;
           const outroDuration = totalFrames - outroStartFrame;
