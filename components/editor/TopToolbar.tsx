@@ -79,7 +79,20 @@ export default function TopToolbar({ article }: TopToolbarProps) {
   const handleDownload = async () => {
     if (!reel) return;
     
-    showStatus('preparing', 'Preparing video...', 5);
+    // Get selected music name for display
+    let selectedMusicName = '';
+    if (reel.musicId) {
+      try {
+        const musicRes = await fetch('/music/metadata.json');
+        const musicData = await musicRes.json();
+        for (const cat of Object.keys(musicData)) {
+          const track = musicData[cat].find((t: any) => t.id === reel.musicId);
+          if (track) { selectedMusicName = track.name; break; }
+        }
+      } catch (e) {}
+    }
+
+    showStatus('preparing', `Preparing video...${selectedMusicName ? ` Music: ${selectedMusicName}` : ''}`, 5);
     
     try {
       await new Promise(resolve => setTimeout(resolve, 200));
@@ -93,7 +106,7 @@ export default function TopToolbar({ article }: TopToolbarProps) {
       const imageStartFrame = headlineEndFrame;     // 2s onwards: Image scenes
       const outroStartFrame = (reel.duration - 2) * fps; // Last 2s: Branding outro
       
-      showStatus('preparing', 'Loading images & audio...', 10);
+      showStatus('preparing', `Loading images & audio...${selectedMusicName ? ` (${selectedMusicName})` : ''}`, 10);
       
       // Preload images
       const loadedImages: HTMLImageElement[] = [];
