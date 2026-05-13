@@ -93,15 +93,15 @@ export default function PreviewPane() {
           {/* Card top accent line */}
           <div className="w-full h-0.5 bg-red-600" />
           
-          {/* Red source label */}
-          <div className="px-3 pt-3">
+          {/* Red source label - centered */}
+          <div className="px-3 pt-3 text-center">
             <span className="text-red-600 font-bold text-xs">বিশেষ</span>
           </div>
           
-          {/* Caption text */}
-          <div className="flex-1 px-3 pt-1 overflow-hidden">
+          {/* Caption text - centered */}
+          <div className="flex-1 px-3 pt-1 overflow-hidden flex items-center justify-center">
             <p
-              className="font-bold leading-tight"
+              className="font-bold leading-tight text-center"
               style={{
                 color: reel.bottomTextColor || '#FFFFFF',
                 fontSize: `${Math.max(12, dimensions.width * 0.055)}px`,

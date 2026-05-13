@@ -327,17 +327,17 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             ctx.fillStyle = '#FF0000';
             ctx.fillRect(0, cardY, 1080, 4);
             
-            // Red source label
+            // Red source label - centered
             ctx.fillStyle = '#FF0000';
             ctx.font = 'bold 32px sans-serif';
-            ctx.textAlign = 'left';
+            ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
-            ctx.fillText('বিশেষ', 40, cardY + 30);
+            ctx.fillText('বিশেষ', 540, cardY + 30);
             
-            // Caption text in card (per-image caption) - dynamic color - larger heading
+            // Caption text in card (per-image caption) - centered
             ctx.fillStyle = reel.bottomTextColor || '#FFFFFF';
             ctx.font = `bold 64px sans-serif`;
-            ctx.textAlign = 'left';
+            ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             
             const captionLines = wrapText(ctx, imageCaption, 1000, 64);
@@ -345,7 +345,7 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             const hlStartY = cardY + 80;
             
             captionLines.forEach((line, i) => {
-              ctx.fillText(line, 40, hlStartY + (i * hlLineHeight));
+              ctx.fillText(line, 540, hlStartY + (i * hlLineHeight));
             });
             
             // === BOTTOM BAR (like TV news channel) ===
