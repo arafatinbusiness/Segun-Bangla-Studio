@@ -1,65 +1,50 @@
 {
-  "breaking-news": [
+  "joy": [
     {
-      "id": "breaking-news/sample-1",
-      "name": "Breaking News Theme",
-      "file": "/music/breaking-news/sample-1.mp3",
+      "id": "joy/upbeat-1",
+      "name": "Upbeat Joy",
+      "file": "/music/joy/upbeat-1.mp3",
       "duration": 30,
-      "category": "Breaking News"
+      "category": "Joy"
+    },
+    {
+      "id": "joy/happy-1",
+      "name": "Happy Melody",
+      "file": "/music/joy/happy-1.mp3",
+      "duration": 30,
+      "category": "Joy"
     }
   ],
-  "emotional": [
+  "intense": [
     {
-      "id": "emotional/sample-1",
-      "name": "Emotional Theme",
-      "file": "/music/emotional/sample-1.mp3",
+      "id": "intense/dramatic-1",
+      "name": "Dramatic Tension",
+      "file": "/music/intense/dramatic-1.mp3",
       "duration": 30,
-      "category": "Emotional"
-    }
-  ],
-  "political": [
+      "category": "Intense"
+    },
     {
-      "id": "political/sample-1",
-      "name": "Political Theme",
-      "file": "/music/political/sample-1.mp3",
+      "id": "intense/powerful-1",
+      "name": "Powerful Drive",
+      "file": "/music/intense/powerful-1.mp3",
       "duration": 30,
-      "category": "Political"
-    }
-  ],
-  "international": [
-    {
-      "id": "international/sample-1",
-      "name": "International Theme",
-      "file": "/music/international/sample-1.mp3",
-      "duration": 30,
-      "category": "International"
-    }
-  ],
-  "war": [
-    {
-      "id": "war/sample-1",
-      "name": "War/Crisis Theme",
-      "file": "/music/war/sample-1.mp3",
-      "duration": 30,
-      "category": "War"
+      "category": "Intense"
     }
   ],
   "sad": [
     {
-      "id": "sad/sample-1",
-      "name": "Sad/Mourning Theme",
-      "file": "/music/sad/sample-1.mp3",
+      "id": "sad/melancholy-1",
+      "name": "Melancholy",
+      "file": "/music/sad/melancholy-1.mp3",
       "duration": 30,
       "category": "Sad"
-    }
-  ],
-  "documentary": [
+    },
     {
-      "id": "documentary/sample-1",
-      "name": "Documentary Theme",
-      "file": "/music/documentary/sample-1.mp3",
+      "id": "sad/sorrow-1",
+      "name": "Sorrow",
+      "file": "/music/sad/sorrow-1.mp3",
       "duration": 30,
-      "category": "Documentary"
+      "category": "Sad"
     }
   ]
 }

@@ -88,11 +88,18 @@ export default function MusicSelector() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {categories.map((cat) => (
-              <SelectItem key={cat} value={cat} className="text-xs">
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </SelectItem>
-            ))}
+            {categories.map((cat) => {
+              const labelMap: Record<string, string> = {
+                'joy': 'আনন্দ (Joy)',
+                'intense': 'তীব্র (Intense)',
+                'sad': 'বিষাদ (Sad)',
+              };
+              return (
+                <SelectItem key={cat} value={cat} className="text-xs">
+                  {labelMap[cat] || cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </div>
