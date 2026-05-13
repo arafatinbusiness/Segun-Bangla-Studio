@@ -302,16 +302,54 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             ctx.fillRect(0, 0, 1080, 1920);
             ctx.globalAlpha = 1;
             
-            // === PHOTOCARD STYLE: Bottom teal bar + text overlay ===
-            // Bottom gradient for readability
-            const gradient = ctx.createLinearGradient(0, 1400, 0, 1920);
-            gradient.addColorStop(0, 'rgba(0,0,0,0)');
-            gradient.addColorStop(1, 'rgba(0,0,0,0.7)');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 1400, 1080, 520);
+            // === PHOTOCARD STYLE: Image fills top, text in separate bottom card ===
+            
+            // Image already drawn above - it fills the full canvas
+            
+            // === BOTTOM TEXT CARD (separate from image, like photocard) ===
+            const cardHeight = 520; // Bottom card area for text
+            const cardY = 1920 - cardHeight;
+            
+            // Semi-transparent dark card background
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+            ctx.fillRect(0, cardY, 1080, cardHeight);
+            
+            // Card top accent line
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(0, cardY, 1080, 4);
+            
+            // Red source label
+            ctx.fillStyle = '#FF0000';
+            ctx.font = 'bold 32px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText('বিশেষ', 40, cardY + 30);
+            
+            // Headline text in card
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = `bold 48px sans-serif`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            
+            const headlineLines = wrapText(ctx, reel.headlineText || 'Segun Bangla', 1000, 48);
+            const hlLineHeight = 62;
+            const hlStartY = cardY + 80;
+            
+            headlineLines.forEach((line, i) => {
+              ctx.fillText(line, 40, hlStartY + (i * hlLineHeight));
+            });
+            
+            // Subtitle in card
+            if (reel.subtitleText) {
+              ctx.fillStyle = '#AAAAAA';
+              ctx.font = '26px sans-serif';
+              ctx.textAlign = 'left';
+              ctx.textBaseline = 'top';
+              ctx.fillText(reel.subtitleText, 40, hlStartY + (headlineLines.length * hlLineHeight) + 10);
+            }
             
             // === TEAL BOTTOM BAR (like TV news channel) ===
-            const barHeight = 80;
+            const barHeight = 60;
             const barY = 1920 - barHeight;
             
             // Teal bar background
@@ -320,52 +358,21 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             
             // Teal bar accent line on top
             ctx.fillStyle = '#14B8A6'; // teal-500
-            ctx.fillRect(0, barY, 1080, 3);
+            ctx.fillRect(0, barY, 1080, 2);
             
             // Bar text - left side: channel name
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 28px sans-serif';
+            ctx.font = 'bold 22px sans-serif';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
             ctx.fillText('সেগুন বাংলা', 30, barY + barHeight / 2);
             
             // Bar text - right side: social handle
             ctx.fillStyle = '#CCFBF1'; // teal-100
-            ctx.font = '20px sans-serif';
+            ctx.font = '18px sans-serif';
             ctx.textAlign = 'right';
             ctx.textBaseline = 'middle';
             ctx.fillText('@segunbangla', 1050, barY + barHeight / 2);
-            
-            // Red source label (like photocard)
-            const sourceLabelY = barY - 420;
-            ctx.fillStyle = '#FF0000';
-            ctx.font = 'bold 36px sans-serif';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('বিশেষ', 60, sourceLabelY);
-            
-            // Headline on image (like photocard)
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = `bold 52px sans-serif`;
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'top';
-            
-            const headlineLines = wrapText(ctx, reel.headlineText || 'Segun Bangla', 960, 52);
-            const hlLineHeight = 68;
-            const hlStartY = sourceLabelY + 50;
-            
-            headlineLines.forEach((line, i) => {
-              ctx.fillText(line, 60, hlStartY + (i * hlLineHeight));
-            });
-            
-            // Subtitle
-            if (reel.subtitleText) {
-              ctx.fillStyle = '#CCCCCC';
-              ctx.font = '28px sans-serif';
-              ctx.textAlign = 'left';
-              ctx.textBaseline = 'top';
-              ctx.fillText(reel.subtitleText, 60, hlStartY + (headlineLines.length * hlLineHeight) + 20);
-            }
           } else {
             // No image - show headline centered
             ctx.fillStyle = template.colors.text;
