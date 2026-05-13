@@ -43,6 +43,21 @@ export default function PreviewPane() {
   // Get first image caption
   const firstImage = reel.images && reel.images.length > 0 ? reel.images[0] : null;
   const imageCaption = firstImage?.caption || reel.headlineText || 'Segun Bangla';
+  
+  // Determine if we should show details or caption (simulate after detailsStartTime)
+  // For preview, we show caption first, then details after the start time
+  // We'll show both states - caption by default, details toggled by a timer
+  const [showDetails, setShowDetails] = useState(false);
+  
+  useEffect(() => {
+    if (!reel) return;
+    const timer = setTimeout(() => {
+      setShowDetails(true);
+    }, (reel.detailsStartTime || 6) * 1000);
+    return () => clearTimeout(timer);
+  }, [reel?.detailsStartTime, reel?.reelId]);
+  
+  const detailsText = reel.description || reel.subtitleText || reel.headlineText || 'Segun Bangla';
 
   return (
     <div
@@ -98,18 +113,31 @@ export default function PreviewPane() {
             <span className="text-red-600 font-bold text-xs">বিশেষ</span>
           </div>
           
-          {/* Caption text - centered */}
+          {/* Text in bottom card - caption first, then details after start time */}
           <div className="flex-1 px-3 pt-1 overflow-hidden flex items-center justify-center">
-            <p
-              className="font-bold leading-tight text-center"
-              style={{
-                color: reel.bottomTextColor || '#FFFFFF',
-                fontSize: `${Math.max(12, dimensions.width * 0.055)}px`,
-                lineHeight: 1.3,
-              }}
-            >
-              {imageCaption}
-            </p>
+            {showDetails ? (
+              <p
+                className="font-bold leading-tight text-center"
+                style={{
+                  color: reel.bottomTextColor || '#FFFFFF',
+                  fontSize: `${Math.max(10, dimensions.width * 0.037)}px`,
+                  lineHeight: 1.3,
+                }}
+              >
+                {detailsText}
+              </p>
+            ) : (
+              <p
+                className="font-bold leading-tight text-center"
+                style={{
+                  color: reel.bottomTextColor || '#FFFFFF',
+                  fontSize: `${Math.max(12, dimensions.width * 0.055)}px`,
+                  lineHeight: 1.3,
+                }}
+              >
+                {imageCaption}
+              </p>
+            )}
           </div>
         </div>
 
