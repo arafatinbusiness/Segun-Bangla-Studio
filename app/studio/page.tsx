@@ -71,6 +71,7 @@ function StudioContent() {
           },
           bottomCardColor: '#1a1a2e',
           bottomBarColor: '#0D9488',
+          bottomTextColor: '#FFFFFF',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           createdBy: 'admin',

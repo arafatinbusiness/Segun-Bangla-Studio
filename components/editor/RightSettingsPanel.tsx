@@ -263,6 +263,48 @@ export default function RightSettingsPanel({ onPreviewUpdate }: RightSettingsPan
                 </div>
               </div>
 
+              {/* Bottom Text Color */}
+              <div>
+                <Label className="text-xs mb-2 block">
+                  Text Color
+                </Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={reel.bottomTextColor}
+                    onChange={(e) => {
+                      dispatch({ type: 'UPDATE_BOTTOM_TEXT_COLOR', payload: e.target.value });
+                      onPreviewUpdate();
+                    }}
+                    className="w-10 h-10 rounded cursor-pointer border border-border"
+                  />
+                  <Input
+                    value={reel.bottomTextColor}
+                    onChange={(e) => {
+                      dispatch({ type: 'UPDATE_BOTTOM_TEXT_COLOR', payload: e.target.value });
+                      onPreviewUpdate();
+                    }}
+                    className="text-xs font-mono flex-1"
+                    placeholder="#FFFFFF"
+                  />
+                </div>
+                <div className="flex gap-1 mt-2">
+                  {['#FFFFFF', '#FCD34D', '#93C5FD', '#86EFAC', '#FCA5A5', '#D8B4FE'].map((color) => (
+                    <button
+                      key={color}
+                      className={`w-6 h-6 rounded-full border-2 transition ${
+                        reel.bottomTextColor === color ? 'border-white scale-110' : 'border-transparent'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => {
+                        dispatch({ type: 'UPDATE_BOTTOM_TEXT_COLOR', payload: color });
+                        onPreviewUpdate();
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+
               {/* Bottom Bar Color */}
               <div>
                 <Label className="text-xs mb-2 block">

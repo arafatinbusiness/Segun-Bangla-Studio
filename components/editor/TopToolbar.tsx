@@ -307,13 +307,39 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             ctx.fillRect(0, 0, 1080, 1920);
             ctx.globalAlpha = 1;
             
-            // === PHOTOCARD STYLE: Image fills top, text in separate bottom card ===
+            // === PHOTOCARD STYLE: Image fills top portion only, text in separate bottom card ===
             
-            // Image already drawn above - it fills the full canvas
-            
-            // === BOTTOM TEXT CARD (separate from image, like photocard) ===
+            // Redraw image to only fill the top portion (above the bottom card)
             const cardHeight = 520; // Bottom card area for text
             const cardY = 1920 - cardHeight;
+            const imageAreaHeight = cardY; // Image only fills above the bottom card
+            
+            // Clip image to top portion only
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(0, 0, 1080, imageAreaHeight);
+            ctx.clip();
+            
+            // Redraw image clipped to top area
+            if (img) {
+              const canvasAspect = 1080 / imageAreaHeight;
+              let sx, sy, sw, sh;
+              if (img.width / img.height > canvasAspect) {
+                sh = img.height;
+                sw = img.height * canvasAspect;
+                sx = (img.width - sw) / 2;
+                sy = 0;
+              } else {
+                sw = img.width;
+                sh = img.width / canvasAspect;
+                sx = 0;
+                sy = (img.height - sh) / 2;
+              }
+              ctx.drawImage(img, sx, sy, sw, sh, 0, 0, 1080, imageAreaHeight);
+            }
+            ctx.restore();
+            
+            // === BOTTOM TEXT CARD (separate from image, like photocard) ===
             
             // Solid card background (user-configurable color)
             ctx.fillStyle = reel.bottomCardColor || '#1a1a2e';
@@ -330,8 +356,8 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             ctx.textBaseline = 'top';
             ctx.fillText('বিশেষ', 40, cardY + 30);
             
-            // Caption text in card (per-image caption)
-            ctx.fillStyle = '#FFFFFF';
+            // Caption text in card (per-image caption) - dynamic color
+            ctx.fillStyle = reel.bottomTextColor || '#FFFFFF';
             ctx.font = `bold 48px sans-serif`;
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
