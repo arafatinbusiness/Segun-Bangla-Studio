@@ -1,0 +1,65 @@
+{
+  "breaking-news": [
+    {
+      "id": "breaking-news/sample-1",
+      "name": "Breaking News Theme",
+      "file": "/music/breaking-news/sample-1.mp3",
+      "duration": 30,
+      "category": "Breaking News"
+    }
+  ],
+  "emotional": [
+    {
+      "id": "emotional/sample-1",
+      "name": "Emotional Theme",
+      "file": "/music/emotional/sample-1.mp3",
+      "duration": 30,
+      "category": "Emotional"
+    }
+  ],
+  "political": [
+    {
+      "id": "political/sample-1",
+      "name": "Political Theme",
+      "file": "/music/political/sample-1.mp3",
+      "duration": 30,
+      "category": "Political"
+    }
+  ],
+  "international": [
+    {
+      "id": "international/sample-1",
+      "name": "International Theme",
+      "file": "/music/international/sample-1.mp3",
+      "duration": 30,
+      "category": "International"
+    }
+  ],
+  "war": [
+    {
+      "id": "war/sample-1",
+      "name": "War/Crisis Theme",
+      "file": "/music/war/sample-1.mp3",
+      "duration": 30,
+      "category": "War"
+    }
+  ],
+  "sad": [
+    {
+      "id": "sad/sample-1",
+      "name": "Sad/Mourning Theme",
+      "file": "/music/sad/sample-1.mp3",
+      "duration": 30,
+      "category": "Sad"
+    }
+  ],
+  "documentary": [
+    {
+      "id": "documentary/sample-1",
+      "name": "Documentary Theme",
+      "file": "/music/documentary/sample-1.mp3",
+      "duration": 30,
+      "category": "Documentary"
+    }
+  ]
+}
