@@ -32,6 +32,17 @@ export default function PreviewPane() {
   }
 
   const template = getTemplate(reel.template);
+  
+  // Calculate photocard proportions matching the video generator
+  const cardHeightRatio = 520 / 1920; // 520px card out of 1920px total
+  const barHeightRatio = 60 / 1920; // 60px bar out of 1920px total
+  const cardHeight = dimensions.height * cardHeightRatio;
+  const barHeight = dimensions.height * barHeightRatio;
+  const imageHeight = dimensions.height - cardHeight;
+
+  // Get first image caption
+  const firstImage = reel.images && reel.images.length > 0 ? reel.images[0] : null;
+  const imageCaption = firstImage?.caption || reel.headlineText || 'Segun Bangla';
 
   return (
     <div
@@ -42,65 +53,76 @@ export default function PreviewPane() {
         backgroundColor: template.colors.background,
       }}
     >
-      {/* Preview Content */}
-      <div className="w-full h-full flex flex-col items-center justify-center p-4">
-        {reel.images && reel.images.length > 0 ? (
-          // Show first image as preview
-          <div className="w-full h-full relative overflow-hidden rounded-md mb-4">
+      {/* PHOTOCARD STYLE PREVIEW */}
+      <div className="w-full h-full flex flex-col">
+        {/* Image Area (top portion only) */}
+        <div
+          className="relative overflow-hidden"
+          style={{ height: `${imageHeight}px` }}
+        >
+          {firstImage ? (
             <img
-              src={reel.images[0].url}
+              src={firstImage.url}
               alt="Preview"
               className="w-full h-full object-cover"
             />
-            {/* Overlay */}
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundColor: template.colors.primary,
-                opacity: template.overlays.opacity,
-                mixBlendMode: 'multiply',
-              }}
-            />
-          </div>
-        ) : (
-          <div className="w-full h-1/2 bg-muted rounded-md mb-4 flex items-center justify-center">
-            <p className="text-muted-foreground text-sm text-center">No image selected</p>
-          </div>
-        )}
-
-        {/* Headline */}
-        <div className="w-full text-center mb-4">
-          <h1
-            className="font-bold leading-tight text-pretty text-balance mb-3"
-            style={{
-              color: template.colors.text,
-              fontSize: `${template.typography.headlineSize * 0.6}px`,
-              fontFamily: template.typography.font,
-            }}
-          >
-            {reel.headlineText || 'Your headline here'}
-          </h1>
-
-          {reel.subtitleText && (
-            <p
-              className="text-sm leading-snug text-balance"
-              style={{
-                color: template.colors.accent,
-                fontSize: `${template.typography.subtitleSize * 0.6}px`,
-                fontFamily: template.typography.font,
-              }}
-            >
-              {reel.subtitleText}
-            </p>
+          ) : (
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <p className="text-muted-foreground text-sm text-center">No image</p>
+            </div>
           )}
+          {/* Overlay */}
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundColor: template.colors.primary,
+              opacity: template.overlays.opacity,
+              mixBlendMode: 'multiply',
+            }}
+          />
         </div>
 
-        {/* Footer */}
+        {/* Bottom Card (solid color with caption) */}
         <div
-          className="absolute bottom-4 right-4 text-xs"
-          style={{ color: template.colors.text, opacity: 0.6 }}
+          className="flex flex-col flex-shrink-0"
+          style={{
+            height: `${cardHeight}px`,
+            backgroundColor: reel.bottomCardColor || '#1a1a2e',
+          }}
         >
-          <p>Segun Bangla</p>
+          {/* Card top accent line */}
+          <div className="w-full h-0.5 bg-red-600" />
+          
+          {/* Red source label */}
+          <div className="px-3 pt-3">
+            <span className="text-red-600 font-bold text-xs">বিশেষ</span>
+          </div>
+          
+          {/* Caption text */}
+          <div className="flex-1 px-3 pt-1 overflow-hidden">
+            <p
+              className="font-bold leading-tight"
+              style={{
+                color: reel.bottomTextColor || '#FFFFFF',
+                fontSize: `${Math.max(12, dimensions.width * 0.055)}px`,
+                lineHeight: 1.3,
+              }}
+            >
+              {imageCaption}
+            </p>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div
+          className="flex-shrink-0 flex items-center justify-between px-3"
+          style={{
+            height: `${barHeight}px`,
+            backgroundColor: reel.bottomBarColor || '#0D9488',
+          }}
+        >
+          <span className="text-white font-bold text-xs">সেগুন বাংলা</span>
+          <span className="text-teal-100 text-[10px]">@segunbangla</span>
         </div>
       </div>
     </div>
