@@ -1,11 +1,27 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useReelEditor } from '@/lib/reelContext';
 import { getTemplate } from '@/lib/templates';
 
 export default function PreviewPane() {
   const { state } = useReelEditor();
   const reel = state.reel;
+  const [dimensions, setDimensions] = useState({ width: 360, height: 640 });
+
+  useEffect(() => {
+    const calculateDimensions = () => {
+      const aspectRatio = 9 / 16;
+      const maxHeight = 600;
+      const previewHeight = Math.min(maxHeight, window.innerHeight * 0.7);
+      const previewWidth = previewHeight * aspectRatio;
+      setDimensions({ width: previewWidth, height: previewHeight });
+    };
+
+    calculateDimensions();
+    window.addEventListener('resize', calculateDimensions);
+    return () => window.removeEventListener('resize', calculateDimensions);
+  }, []);
 
   if (!reel) {
     return (
@@ -16,19 +32,13 @@ export default function PreviewPane() {
   }
 
   const template = getTemplate(reel.template);
-  const aspectRatio = 9 / 16;
-
-  // Calculate preview dimensions based on available space
-  const maxHeight = 600;
-  const previewHeight = Math.min(maxHeight, window.innerHeight * 0.7);
-  const previewWidth = previewHeight * aspectRatio;
 
   return (
     <div
-      className="relative border-4 border-muted-foreground/30 rounded-lg overflow-hidden shadow-2xl"
+      className="preview-container relative border-4 border-muted-foreground/30 rounded-lg overflow-hidden shadow-2xl"
       style={{
-        width: `${previewWidth}px`,
-        height: `${previewHeight}px`,
+        width: `${dimensions.width}px`,
+        height: `${dimensions.height}px`,
         backgroundColor: template.colors.background,
       }}
     >

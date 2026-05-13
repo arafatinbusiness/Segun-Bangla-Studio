@@ -10,7 +10,7 @@ interface TopToolbarProps {
   article: Article;
 }
 
-type DownloadStatus = 'idle' | 'rendering' | 'capturing' | 'downloading' | 'complete' | 'error';
+type DownloadStatus = 'idle' | 'capturing' | 'downloading' | 'complete' | 'error';
 
 export default function TopToolbar({ article }: TopToolbarProps) {
   const { state } = useReelEditor();
@@ -25,13 +25,12 @@ export default function TopToolbar({ article }: TopToolbarProps) {
     setDownloadStatus(status);
     setStatusMessage(message);
     
-    // Auto-clear status after 3 seconds for success/error
     if (status === 'complete' || status === 'error') {
       if (statusTimeoutRef.current) clearTimeout(statusTimeoutRef.current);
       statusTimeoutRef.current = setTimeout(() => {
         setDownloadStatus('idle');
         setStatusMessage('');
-      }, 3000);
+      }, 4000);
     }
   };
 
@@ -64,50 +63,31 @@ export default function TopToolbar({ article }: TopToolbarProps) {
   const handleDownload = async () => {
     if (!reel) return;
     
-    showStatus('rendering', 'Step 1/3: Rendering video...');
+    showStatus('capturing', 'Capturing preview...');
     
     try {
-      // Step 1: Call render API
-      const response = await fetch('/api/render/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          articleId: reel.articleId,
-          template: reel.template,
-          title: reel.title,
-          headlineText: reel.headlineText,
-          subtitleText: reel.subtitleText,
-          duration: reel.duration,
-          musicId: reel.musicId,
-          musicVolume: reel.musicVolume,
-          images: reel.images,
-        }),
-      });
-
-      const data = await response.json();
-      
-      if (!data.success) {
-        showStatus('error', 'Render failed: ' + (data.error || 'Unknown error'));
-        return;
-      }
-
-      // Step 2: Capture preview
-      showStatus('capturing', 'Step 2/3: Capturing preview...');
-      
-      // Wait a frame for DOM to update
-      await new Promise(resolve => requestAnimationFrame(resolve));
+      // Wait for DOM to be ready
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const previewEl = document.querySelector('.preview-container') as HTMLElement;
       if (!previewEl) {
-        showStatus('error', 'Preview element not found');
+        showStatus('error', 'Preview not found. Make sure the preview is visible.');
         return;
       }
 
-      // Step 3: Generate and download image
-      showStatus('downloading', 'Step 3/3: Generating download...');
+      showStatus('downloading', 'Generating image...');
+      
+      // Wait a frame for UI update
+      await new Promise(resolve => requestAnimationFrame(resolve));
       
       const canvas = document.createElement('canvas');
       const rect = previewEl.getBoundingClientRect();
+      
+      if (rect.width === 0 || rect.height === 0) {
+        showStatus('error', 'Preview has no dimensions. Try again.');
+        return;
+      }
+      
       canvas.width = rect.width * 2;
       canvas.height = rect.height * 2;
       const ctx = canvas.getContext('2d');
@@ -154,17 +134,19 @@ export default function TopToolbar({ article }: TopToolbarProps) {
       const link = document.createElement('a');
       link.download = `segun-bangla-${reel.articleId}.png`;
       link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
       
       showStatus('complete', '✅ Download complete!');
     } catch (error) {
       console.error('Download error:', error);
-      showStatus('error', 'Download failed. Check console.');
+      showStatus('error', 'Download failed. See console for details.');
     }
   };
 
   return (
-    <div className="flex-shrink-0 bg-card border-b border-border px-6 py-4 flex items-center justify-between">
+    <div className="flex-shrink-0 bg-card border-b border-border px-6 py-4 flex items-center justify-between relative">
       {/* Left Section */}
       <div className="flex items-center gap-4">
         <Button
@@ -206,9 +188,9 @@ export default function TopToolbar({ article }: TopToolbarProps) {
           size="sm"
           className="bg-primary text-primary-foreground"
           onClick={handleDownload}
-          disabled={downloadStatus === 'rendering' || downloadStatus === 'capturing' || downloadStatus === 'downloading'}
+          disabled={downloadStatus === 'capturing' || downloadStatus === 'downloading'}
         >
-          {downloadStatus === 'rendering' || downloadStatus === 'capturing' || downloadStatus === 'downloading' ? (
+          {downloadStatus === 'capturing' || downloadStatus === 'downloading' ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
           ) : downloadStatus === 'complete' ? (
             <CheckCircle2 className="w-4 h-4 mr-2 text-green-300" />
@@ -217,9 +199,8 @@ export default function TopToolbar({ article }: TopToolbarProps) {
           ) : (
             <Download className="w-4 h-4 mr-2" />
           )}
-          {downloadStatus === 'rendering' ? 'Rendering...' :
-           downloadStatus === 'capturing' ? 'Capturing...' :
-           downloadStatus === 'downloading' ? 'Downloading...' :
+          {downloadStatus === 'capturing' ? 'Capturing...' :
+           downloadStatus === 'downloading' ? 'Generating...' :
            downloadStatus === 'complete' ? 'Downloaded!' :
            downloadStatus === 'error' ? 'Failed' :
            'Download Video'}
@@ -228,13 +209,13 @@ export default function TopToolbar({ article }: TopToolbarProps) {
 
       {/* Status Bar */}
       {downloadStatus !== 'idle' && (
-        <div className={`absolute bottom-0 left-0 right-0 translate-y-full px-6 py-2 text-xs border-t ${
+        <div className={`absolute top-full left-0 right-0 px-6 py-2 text-xs border-b ${
           downloadStatus === 'complete' ? 'bg-green-50 border-green-200 text-green-700' :
           downloadStatus === 'error' ? 'bg-red-50 border-red-200 text-red-700' :
           'bg-blue-50 border-blue-200 text-blue-700'
         }`}>
           <div className="flex items-center gap-2">
-            {downloadStatus === 'rendering' || downloadStatus === 'capturing' || downloadStatus === 'downloading' ? (
+            {downloadStatus === 'capturing' || downloadStatus === 'downloading' ? (
               <Loader2 className="w-3 h-3 animate-spin" />
             ) : downloadStatus === 'complete' ? (
               <CheckCircle2 className="w-3 h-3" />
