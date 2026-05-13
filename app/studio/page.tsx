@@ -47,7 +47,7 @@ function StudioContent() {
           reelId: uuidv4(),
           articleId: fetchedArticle.id,
           title: fetchedArticle.title,
-          template: 'breaking-news',
+          template: 'minimal-dark',
           duration: 20,
           musicId: '',
           musicVolume: 1,

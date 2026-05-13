@@ -12,7 +12,7 @@ export const templates: Record<TemplateType, Template> = {
 };
 
 export function getTemplate(type: TemplateType): Template {
-  return templates[type] || breakingNewsTemplate;
+  return templates[type] || minimalDarkTemplate;
 }
 
 export function getTemplateList() {
