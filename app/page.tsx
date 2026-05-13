@@ -1,10 +1,30 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { Film, Sparkles, Zap } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Film, Sparkles, Zap, Plus, Image, Type } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 export default function Home() {
+  const router = useRouter();
+  const [manualTitle, setManualTitle] = useState('');
+  const [manualImageUrl, setManualImageUrl] = useState('');
+  const [manualCaption, setManualCaption] = useState('');
+
+  const handleManualCreate = () => {
+    const params = new URLSearchParams();
+    if (manualTitle) params.set('title', manualTitle);
+    if (manualImageUrl) params.set('image', manualImageUrl);
+    if (manualCaption) params.set('caption', manualCaption);
+    params.set('manual', 'true');
+    router.push(`/studio?${params.toString()}`);
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       {/* Hero Section */}
@@ -31,13 +51,67 @@ export default function Home() {
               Create Your First Reel
             </Button>
           </Link>
-          <Button
-            size="lg"
-            variant="outline"
-            className="border-primary text-primary hover:bg-primary/10 px-8"
-          >
-            Learn More
-          </Button>
+          
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary/10 px-8"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Create Manually
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Create Video Manually</DialogTitle>
+                <DialogDescription>
+                  Paste image URLs and captions to create a video without an article.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div>
+                  <Label htmlFor="manual-title">Video Title</Label>
+                  <Input
+                    id="manual-title"
+                    value={manualTitle}
+                    onChange={(e) => setManualTitle(e.target.value)}
+                    placeholder="Enter video title..."
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="manual-image">Image URL</Label>
+                  <Input
+                    id="manual-image"
+                    value={manualImageUrl}
+                    onChange={(e) => setManualImageUrl(e.target.value)}
+                    placeholder="https://example.com/image.jpg"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="manual-caption">Caption Text</Label>
+                  <Input
+                    id="manual-caption"
+                    value={manualCaption}
+                    onChange={(e) => setManualCaption(e.target.value)}
+                    placeholder="Enter caption for the image..."
+                    className="mt-1"
+                  />
+                </div>
+                <Button
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                  onClick={handleManualCreate}
+                  disabled={!manualImageUrl && !manualCaption}
+                >
+                  <Film className="w-4 h-4 mr-2" />
+                  Open Studio
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Features */}

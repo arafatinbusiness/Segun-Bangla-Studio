@@ -216,10 +216,17 @@ export default function TopToolbar({ article }: TopToolbarProps) {
           
           // Draw image if available
           if (loadedImages.length > 0) {
-            // Determine which image to show based on frame position
-            // For now use first image, but we can extend to cycle through images
-            const imgIndex = 0;
-            const img = loadedImages[imgIndex];
+            // Cycle through images in serial order based on position
+            const sortedImages = [...reel.images].sort((a, b) => a.position - b.position);
+            const totalImageDuration = imageDuration / sortedImages.length;
+            const currentImageSlot = Math.min(
+              Math.floor(imageFrame / totalImageDuration),
+              sortedImages.length - 1
+            );
+            const imgIndex = sortedImages[currentImageSlot]?.id 
+              ? reel.images.findIndex(img => img.id === sortedImages[currentImageSlot].id)
+              : 0;
+            const img = loadedImages[Math.min(imgIndex, loadedImages.length - 1)];
             
             // Get image animation from reel config
             const animation = reel.images[imgIndex]?.animation || 'zoom';

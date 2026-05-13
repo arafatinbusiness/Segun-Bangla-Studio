@@ -16,12 +16,80 @@ function StudioContent() {
   const { dispatch } = useReelEditor();
 
   useEffect(() => {
-    const fetchArticle = async () => {
+    const initStudio = async () => {
       try {
         const articleId = searchParams.get('article');
+        const isManual = searchParams.get('manual') === 'true';
+
+        if (isManual) {
+          // Manual creation mode - no article needed
+          const manualTitle = searchParams.get('title') || 'Manual Video';
+          const manualImageUrl = searchParams.get('image') || '';
+          const manualCaption = searchParams.get('caption') || '';
+
+          // Create a placeholder article
+          const placeholderArticle: Article = {
+            id: 'manual',
+            title: manualTitle,
+            content: '',
+            excerpt: manualCaption,
+            imageUrl: manualImageUrl,
+            categoryId: '',
+            slug: 'manual-video',
+            publishedAt: new Date().toISOString(),
+            authorId: 'admin',
+            status: 'published',
+            isLead: false,
+            isFeatured: false,
+            viewCount: 0,
+          };
+          setArticle(placeholderArticle);
+
+          // Initialize reel with manual data
+          const initialReel: ReelConfig = {
+            reelId: uuidv4(),
+            articleId: 'manual',
+            title: manualTitle,
+            template: 'minimal-dark',
+            duration: 20,
+            musicId: '',
+            musicVolume: 1,
+            images: manualImageUrl
+              ? [
+                  {
+                    id: uuidv4(),
+                    url: manualImageUrl,
+                    duration: 5,
+                    animation: 'zoom',
+                    position: 0,
+                    caption: manualCaption || undefined,
+                  },
+                ]
+              : [],
+            headlineText: manualTitle,
+            subtitleText: manualCaption,
+            status: 'draft',
+            metadata: {
+              fps: 30,
+              width: 1080,
+              height: 1920,
+              format: 'mp4',
+            },
+            bottomCardColor: '#1a1a2e',
+            bottomBarColor: '#0D9488',
+            bottomTextColor: '#FFFFFF',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            createdBy: 'admin',
+          };
+
+          dispatch({ type: 'SET_REEL', payload: initialReel });
+          setLoading(false);
+          return;
+        }
 
         if (!articleId) {
-          setError('No article ID provided');
+          setError('No article ID provided. Use "Create Manually" to create a video without an article.');
           setLoading(false);
           return;
         }
@@ -85,7 +153,7 @@ function StudioContent() {
       }
     };
 
-    fetchArticle();
+    initStudio();
   }, [searchParams, dispatch]);
 
   if (loading) {
@@ -93,7 +161,7 @@ function StudioContent() {
       <div className="flex items-center justify-center h-screen bg-background">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-foreground text-lg">Loading article...</p>
+          <p className="text-foreground text-lg">Loading studio...</p>
         </div>
       </div>
     );
