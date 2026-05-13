@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Film, Sparkles, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -21,13 +22,15 @@ export default function Home() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <Button
-            size="lg"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
-          >
-            <Sparkles className="w-5 h-5 mr-2" />
-            Create Your First Reel
-          </Button>
+          <Link href="/studio">
+            <Button
+              size="lg"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
+            >
+              <Sparkles className="w-5 h-5 mr-2" />
+              Create Your First Reel
+            </Button>
+          </Link>
           <Button
             size="lg"
             variant="outline"
