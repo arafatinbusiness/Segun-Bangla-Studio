@@ -49,6 +49,9 @@ export interface ReelConfig {
     height: 1920;
     format: 'mp4';
   };
+  // Visual customization
+  bottomCardColor: string; // solid color for bottom text card (e.g. '#1a1a2e')
+  bottomBarColor: string; // color for bottom teal bar (e.g. '#0D9488')
   createdAt: string;
   updatedAt: string;
   createdBy: string;

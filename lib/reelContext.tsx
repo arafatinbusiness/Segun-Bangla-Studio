@@ -20,6 +20,8 @@ type ReelEditorAction =
   | { type: 'UPDATE_IMAGE'; payload: ReelImage }
   | { type: 'DELETE_IMAGE'; payload: string }
   | { type: 'REORDER_IMAGES'; payload: ReelImage[] }
+  | { type: 'UPDATE_BOTTOM_CARD_COLOR'; payload: string }
+  | { type: 'UPDATE_BOTTOM_BAR_COLOR'; payload: string }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'RESET' };
@@ -145,6 +147,30 @@ function reelReducer(state: ReelEditorState, action: ReelEditorAction): ReelEdit
           ? {
               ...state.reel,
               images: action.payload,
+              updatedAt: new Date().toISOString(),
+            }
+          : null,
+      };
+
+    case 'UPDATE_BOTTOM_CARD_COLOR':
+      return {
+        ...state,
+        reel: state.reel
+          ? {
+              ...state.reel,
+              bottomCardColor: action.payload,
+              updatedAt: new Date().toISOString(),
+            }
+          : null,
+      };
+
+    case 'UPDATE_BOTTOM_BAR_COLOR':
+      return {
+        ...state,
+        reel: state.reel
+          ? {
+              ...state.reel,
+              bottomBarColor: action.payload,
               updatedAt: new Date().toISOString(),
             }
           : null,

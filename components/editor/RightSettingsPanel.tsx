@@ -19,6 +19,7 @@ import {
 import { getTemplateList } from '@/lib/templates';
 import { TemplateType } from '@/lib/types';
 import TemplateSelector from './TemplateSelector';
+import { Palette } from 'lucide-react';
 
 interface RightSettingsPanelProps {
   onPreviewUpdate: () => void;
@@ -204,6 +205,104 @@ export default function RightSettingsPanel({ onPreviewUpdate }: RightSettingsPan
               <div className="flex justify-between text-xs text-muted-foreground mt-2">
                 <span>7s</span>
                 <span>30s</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Bottom Bar Colors */}
+          <Card className="border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Palette className="w-4 h-4" />
+                Bottom Bar Colors
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Customize the bottom card and bar colors
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Bottom Card Color */}
+              <div>
+                <Label className="text-xs mb-2 block">
+                  Card Background Color
+                </Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={reel.bottomCardColor}
+                    onChange={(e) => {
+                      dispatch({ type: 'UPDATE_BOTTOM_CARD_COLOR', payload: e.target.value });
+                      onPreviewUpdate();
+                    }}
+                    className="w-10 h-10 rounded cursor-pointer border border-border"
+                  />
+                  <Input
+                    value={reel.bottomCardColor}
+                    onChange={(e) => {
+                      dispatch({ type: 'UPDATE_BOTTOM_CARD_COLOR', payload: e.target.value });
+                      onPreviewUpdate();
+                    }}
+                    className="text-xs font-mono flex-1"
+                    placeholder="#1a1a2e"
+                  />
+                </div>
+                <div className="flex gap-1 mt-2">
+                  {['#1a1a2e', '#0f0f23', '#2d1b69', '#1e293b', '#111827', '#1c1917'].map((color) => (
+                    <button
+                      key={color}
+                      className={`w-6 h-6 rounded-full border-2 transition ${
+                        reel.bottomCardColor === color ? 'border-white scale-110' : 'border-transparent'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => {
+                        dispatch({ type: 'UPDATE_BOTTOM_CARD_COLOR', payload: color });
+                        onPreviewUpdate();
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Bottom Bar Color */}
+              <div>
+                <Label className="text-xs mb-2 block">
+                  Bottom Bar Color
+                </Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={reel.bottomBarColor}
+                    onChange={(e) => {
+                      dispatch({ type: 'UPDATE_BOTTOM_BAR_COLOR', payload: e.target.value });
+                      onPreviewUpdate();
+                    }}
+                    className="w-10 h-10 rounded cursor-pointer border border-border"
+                  />
+                  <Input
+                    value={reel.bottomBarColor}
+                    onChange={(e) => {
+                      dispatch({ type: 'UPDATE_BOTTOM_BAR_COLOR', payload: e.target.value });
+                      onPreviewUpdate();
+                    }}
+                    className="text-xs font-mono flex-1"
+                    placeholder="#0D9488"
+                  />
+                </div>
+                <div className="flex gap-1 mt-2">
+                  {['#0D9488', '#2563eb', '#dc2626', '#7c3aed', '#059669', '#d97706'].map((color) => (
+                    <button
+                      key={color}
+                      className={`w-6 h-6 rounded-full border-2 transition ${
+                        reel.bottomBarColor === color ? 'border-white scale-110' : 'border-transparent'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => {
+                        dispatch({ type: 'UPDATE_BOTTOM_BAR_COLOR', payload: color });
+                        onPreviewUpdate();
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
             </CardContent>
           </Card>

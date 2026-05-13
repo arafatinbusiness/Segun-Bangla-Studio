@@ -69,6 +69,8 @@ function StudioContent() {
             height: 1920,
             format: 'mp4',
           },
+          bottomCardColor: '#1a1a2e',
+          bottomBarColor: '#0D9488',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           createdBy: 'admin',

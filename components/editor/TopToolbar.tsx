@@ -315,8 +315,8 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             const cardHeight = 520; // Bottom card area for text
             const cardY = 1920 - cardHeight;
             
-            // Semi-transparent dark card background
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+            // Solid card background (user-configurable color)
+            ctx.fillStyle = reel.bottomCardColor || '#1a1a2e';
             ctx.fillRect(0, cardY, 1080, cardHeight);
             
             // Card top accent line
@@ -344,16 +344,17 @@ export default function TopToolbar({ article }: TopToolbarProps) {
               ctx.fillText(line, 40, hlStartY + (i * hlLineHeight));
             });
             
-            // === TEAL BOTTOM BAR (like TV news channel) ===
+            // === BOTTOM BAR (like TV news channel) ===
             const barHeight = 60;
             const barY = 1920 - barHeight;
             
-            // Teal bar background
-            ctx.fillStyle = '#0D9488'; // teal-600
+            // Bottom bar background (user-configurable color)
+            const barColor = reel.bottomBarColor || '#0D9488';
+            ctx.fillStyle = barColor;
             ctx.fillRect(0, barY, 1080, barHeight);
             
-            // Teal bar accent line on top
-            ctx.fillStyle = '#14B8A6'; // teal-500
+            // Bottom bar accent line on top (lighter shade)
+            ctx.fillStyle = lightenColor(barColor, 30);
             ctx.fillRect(0, barY, 1080, 2);
             
             // Bar text - left side: channel name
@@ -364,7 +365,7 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             ctx.fillText('সেগুন বাংলা', 30, barY + barHeight / 2);
             
             // Bar text - right side: social handle
-            ctx.fillStyle = '#CCFBF1'; // teal-100
+            ctx.fillStyle = '#CCFBF1';
             ctx.font = '18px sans-serif';
             ctx.textAlign = 'right';
             ctx.textBaseline = 'middle';
@@ -541,6 +542,16 @@ export default function TopToolbar({ article }: TopToolbarProps) {
       )}
     </div>
   );
+}
+
+// Helper to lighten a hex color by a percentage
+function lightenColor(hex: string, percent: number): string {
+  const num = parseInt(hex.replace('#', ''), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = Math.min(255, (num >> 16) + amt);
+  const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
+  const B = Math.min(255, (num & 0x0000FF) + amt);
+  return `#${(1 << 24 | R << 16 | G << 8 | B).toString(16).slice(1)}`;
 }
 
 // Helper to wrap text into lines
