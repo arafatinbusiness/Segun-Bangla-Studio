@@ -222,7 +222,7 @@ export default function RightSettingsPanel({ onPreviewUpdate }: RightSettingsPan
               onClick={handleRender}
               disabled={rendering}
             >
-              {rendering ? 'Rendering...' : 'Render Video'}
+              {rendering ? 'Exporting...' : 'Export Video'}
             </Button>
             {renderStatus && (
               <p className="text-xs text-center text-muted-foreground mt-2">{renderStatus}</p>
