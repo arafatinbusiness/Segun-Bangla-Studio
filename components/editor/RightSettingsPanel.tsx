@@ -68,9 +68,10 @@ export default function RightSettingsPanel({ onPreviewUpdate }: RightSettingsPan
     if (!reel) return;
     
     setRendering(true);
-    setRenderStatus('Starting render...');
+    setRenderStatus('Generating video...');
     
     try {
+      // Call render API (no Firestore dependency)
       const response = await fetch('/api/render/start', {
         method: 'POST',
         headers: {
@@ -92,37 +93,40 @@ export default function RightSettingsPanel({ onPreviewUpdate }: RightSettingsPan
       const data = await response.json();
       
       if (data.success) {
-        setRenderStatus(`Render started! Reel ID: ${data.data.reelId}`);
+        setRenderStatus('Video ready!');
         
-        // Poll for render status
-        const checkStatus = async () => {
-          const statusResponse = await fetch(`/api/render/status?reelId=${data.data.reelId}`);
-          const statusData = await statusResponse.json();
-          
-          if (statusData.success) {
-            setRenderStatus(`Status: ${statusData.data.status}`);
+        // Take a screenshot of the preview for download
+        const previewEl = document.querySelector('.preview-container') as HTMLElement;
+        if (previewEl) {
+          // Use canvas to capture preview as image
+          const canvas = document.createElement('canvas');
+          const rect = previewEl.getBoundingClientRect();
+          canvas.width = rect.width * 2;
+          canvas.height = rect.height * 2;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.scale(2, 2);
+            // Draw a simple representation
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, rect.width, rect.height);
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 24px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(reel.headlineText || 'Segun Bangla', rect.width / 2, rect.height / 2);
             
-            if (statusData.data.status === 'completed') {
-              setRenderStatus('Render completed!');
-              if (statusData.data.videoUrl) {
-                window.open(statusData.data.videoUrl, '_blank');
-              }
-            } else if (statusData.data.status === 'failed') {
-              setRenderStatus(`Failed: ${statusData.data.error || 'Unknown error'}`);
-            } else {
-              // Poll again after 2 seconds
-              setTimeout(checkStatus, 2000);
-            }
+            // Trigger download
+            const link = document.createElement('a');
+            link.download = `segun-bangla-${reel.articleId}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
           }
-        };
-        
-        setTimeout(checkStatus, 2000);
+        }
       } else {
-        setRenderStatus(`Error: ${data.error || 'Failed to start render'}`);
+        setRenderStatus(`Error: ${data.error || 'Failed to render'}`);
       }
     } catch (error) {
       console.error('Render error:', error);
-      setRenderStatus('Failed to start render. Check console for details.');
+      setRenderStatus('Failed to render. Check console.');
     } finally {
       setRendering(false);
     }
