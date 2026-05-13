@@ -302,16 +302,49 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             ctx.fillRect(0, 0, 1080, 1920);
             ctx.globalAlpha = 1;
             
-            // === PHOTOCARD STYLE: Bottom text overlay ===
+            // === PHOTOCARD STYLE: Bottom teal bar + text overlay ===
+            // Bottom gradient for readability
+            const gradient = ctx.createLinearGradient(0, 1400, 0, 1920);
+            gradient.addColorStop(0, 'rgba(0,0,0,0)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0.7)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 1400, 1080, 520);
+            
+            // === TEAL BOTTOM BAR (like TV news channel) ===
+            const barHeight = 80;
+            const barY = 1920 - barHeight;
+            
+            // Teal bar background
+            ctx.fillStyle = '#0D9488'; // teal-600
+            ctx.fillRect(0, barY, 1080, barHeight);
+            
+            // Teal bar accent line on top
+            ctx.fillStyle = '#14B8A6'; // teal-500
+            ctx.fillRect(0, barY, 1080, 3);
+            
+            // Bar text - left side: channel name
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 28px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('সেগুন বাংলা', 30, barY + barHeight / 2);
+            
+            // Bar text - right side: social handle
+            ctx.fillStyle = '#CCFBF1'; // teal-100
+            ctx.font = '20px sans-serif';
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('@segunbangla', 1050, barY + barHeight / 2);
+            
             // Red source label (like photocard)
-            const sourceLabelY = 1500;
+            const sourceLabelY = barY - 420;
             ctx.fillStyle = '#FF0000';
             ctx.font = 'bold 36px sans-serif';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
             ctx.fillText('বিশেষ', 60, sourceLabelY);
             
-            // Headline on image (like photocard - black bold text)
+            // Headline on image (like photocard)
             ctx.fillStyle = '#FFFFFF';
             ctx.font = `bold 52px sans-serif`;
             ctx.textAlign = 'left';
@@ -326,36 +359,6 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             });
             
             // Subtitle
-            if (reel.subtitleText) {
-              ctx.fillStyle = '#CCCCCC';
-              ctx.font = '28px sans-serif';
-              ctx.textAlign = 'left';
-              ctx.textBaseline = 'top';
-              ctx.fillText(reel.subtitleText, 60, hlStartY + (headlineLines.length * hlLineHeight) + 20);
-            }
-            
-            // Bottom gradient for readability
-            const gradient = ctx.createLinearGradient(0, 1400, 0, 1920);
-            gradient.addColorStop(0, 'rgba(0,0,0,0)');
-            gradient.addColorStop(1, 'rgba(0,0,0,0.8)');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 1400, 1080, 520);
-            
-            // Redraw text on top of gradient
-            ctx.fillStyle = '#FF0000';
-            ctx.font = 'bold 36px sans-serif';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('বিশেষ', 60, sourceLabelY);
-            
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = `bold 52px sans-serif`;
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'top';
-            headlineLines.forEach((line, i) => {
-              ctx.fillText(line, 60, hlStartY + (i * hlLineHeight));
-            });
-            
             if (reel.subtitleText) {
               ctx.fillStyle = '#CCCCCC';
               ctx.font = '28px sans-serif';
