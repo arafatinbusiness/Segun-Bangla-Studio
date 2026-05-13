@@ -25,6 +25,8 @@ type ReelEditorAction =
   | { type: 'UPDATE_BOTTOM_BAR_COLOR'; payload: string }
   | { type: 'UPDATE_BOTTOM_TEXT_COLOR'; payload: string }
   | { type: 'UPDATE_DETAILS_START_TIME'; payload: number }
+  | { type: 'UPDATE_CAPTION_FONT_SIZE'; payload: number }
+  | { type: 'UPDATE_DESCRIPTION_FONT_SIZE'; payload: number }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'RESET' };
@@ -210,6 +212,30 @@ function reelReducer(state: ReelEditorState, action: ReelEditorAction): ReelEdit
           ? {
               ...state.reel,
               detailsStartTime: action.payload,
+              updatedAt: new Date().toISOString(),
+            }
+          : null,
+      };
+
+    case 'UPDATE_CAPTION_FONT_SIZE':
+      return {
+        ...state,
+        reel: state.reel
+          ? {
+              ...state.reel,
+              captionFontSize: action.payload,
+              updatedAt: new Date().toISOString(),
+            }
+          : null,
+      };
+
+    case 'UPDATE_DESCRIPTION_FONT_SIZE':
+      return {
+        ...state,
+        reel: state.reel
+          ? {
+              ...state.reel,
+              descriptionFontSize: action.payload,
               updatedAt: new Date().toISOString(),
             }
           : null,

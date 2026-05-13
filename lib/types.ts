@@ -55,6 +55,8 @@ export interface ReelConfig {
   bottomBarColor: string; // color for bottom teal bar (e.g. '#0D9488')
   bottomTextColor: string; // color for caption text in bottom card (e.g. '#FFFFFF')
   detailsStartTime: number; // seconds after which article details appear (default 6)
+  captionFontSize: number; // font size for per-image caption in bottom card (default 64)
+  descriptionFontSize: number; // font size for description text in bottom card (default 40)
   createdAt: string;
   updatedAt: string;
   createdBy: string;

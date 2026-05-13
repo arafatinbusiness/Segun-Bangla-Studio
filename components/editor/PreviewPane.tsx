@@ -120,7 +120,7 @@ export default function PreviewPane() {
                 className="font-bold leading-tight text-center"
                 style={{
                   color: reel.bottomTextColor || '#FFFFFF',
-                  fontSize: `${Math.max(10, dimensions.width * 0.037)}px`,
+                  fontSize: `${Math.max(8, dimensions.width * ((reel.descriptionFontSize || 40) / 1080))}px`,
                   lineHeight: 1.3,
                 }}
               >
@@ -131,7 +131,7 @@ export default function PreviewPane() {
                 className="font-bold leading-tight text-center"
                 style={{
                   color: reel.bottomTextColor || '#FFFFFF',
-                  fontSize: `${Math.max(12, dimensions.width * 0.055)}px`,
+                  fontSize: `${Math.max(10, dimensions.width * ((reel.captionFontSize || 64) / 1080))}px`,
                   lineHeight: 1.3,
                 }}
               >

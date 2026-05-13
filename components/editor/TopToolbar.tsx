@@ -343,11 +343,11 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             if (showDetails) {
               // Show article description (max 4 lines)
               cardText = reel.description || article.excerpt || reel.subtitleText || reel.headlineText || 'Segun Bangla';
-              cardFontSize = 40;
+              cardFontSize = reel.descriptionFontSize || 40;
             } else {
               // Show per-image caption
               cardText = imageCaption;
-              cardFontSize = 64;
+              cardFontSize = reel.captionFontSize || 64;
             }
             
             ctx.fillStyle = reel.bottomTextColor || '#FFFFFF';

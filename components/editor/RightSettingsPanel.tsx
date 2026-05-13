@@ -169,6 +169,58 @@ export default function RightSettingsPanel({ onPreviewUpdate }: RightSettingsPan
             </CardContent>
           </Card>
 
+          {/* Font Size Settings */}
+          <Card className="border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">Font Size</CardTitle>
+              <CardDescription className="text-xs">
+                Adjust caption and description text size
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-xs mb-2 block">
+                  Caption Size: {reel.captionFontSize || 64}px
+                </Label>
+                <Slider
+                  value={[(reel.captionFontSize || 64)]}
+                  onValueChange={(value) => {
+                    dispatch({ type: 'UPDATE_CAPTION_FONT_SIZE', payload: value[0] });
+                    onPreviewUpdate();
+                  }}
+                  min={24}
+                  max={96}
+                  step={2}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <span>24px</span>
+                  <span>96px</span>
+                </div>
+              </div>
+              <div>
+                <Label className="text-xs mb-2 block">
+                  Description Size: {reel.descriptionFontSize || 40}px
+                </Label>
+                <Slider
+                  value={[(reel.descriptionFontSize || 40)]}
+                  onValueChange={(value) => {
+                    dispatch({ type: 'UPDATE_DESCRIPTION_FONT_SIZE', payload: value[0] });
+                    onPreviewUpdate();
+                  }}
+                  min={16}
+                  max={72}
+                  step={2}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <span>16px</span>
+                  <span>72px</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Bottom Bar Colors */}
           <Card className="border-border">
             <CardHeader className="pb-3">
