@@ -30,7 +30,7 @@ export default function MusicSelector() {
 
   useEffect(() => {
     // Load music metadata
-    fetch('/lib/music/metadata.json')
+    fetch('/music/metadata.json')
       .then((res) => res.json())
       .then((data) => {
         setMusicData(data);
