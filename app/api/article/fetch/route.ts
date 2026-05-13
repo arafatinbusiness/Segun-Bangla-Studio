@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebaseAdmin';
 import { Article, ApiResponse } from '@/lib/types';
 
 export async function GET(request: NextRequest) {
@@ -18,32 +17,56 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch article from Firestore
-    const docRef = adminDb.collection('articles').doc(articleId);
-    const doc = await docRef.get();
-
-    if (!doc.exists) {
+    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+    if (!projectId) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Article not found',
+          error: 'Firebase project ID not configured',
         } as ApiResponse,
-        { status: 404 }
+        { status: 500 }
       );
     }
 
-    // Extract article data
-    const articleData = doc.data() as Omit<Article, 'id'>;
-    const article: Article = {
-      id: doc.id,
-      ...articleData,
-    };
+    // Use Firebase REST API to fetch the document
+    // This works without Admin SDK credentials
+    const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+    const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/articles/${articleId}?key=${apiKey}`;
+    
+    const response = await fetch(firestoreUrl, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Article not found',
+          } as ApiResponse,
+          { status: 404 }
+        );
+      }
+      
+      const errorText = await response.text();
+      console.error('[v0] Firestore REST API error:', response.status, errorText);
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Failed to fetch article: ${response.status}`,
+        } as ApiResponse,
+        { status: response.status }
+      );
+    }
+
+    const data = await response.json();
+    const article = convertFirestoreDocument(data);
 
     return NextResponse.json(
-      {
-        success: true,
-        data: article,
-      } as ApiResponse<Article>,
+      { success: true, data: article } as ApiResponse<Article>,
       { status: 200 }
     );
   } catch (error) {
@@ -56,4 +79,45 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+/**
+ * Converts a Firestore REST API document to our Article type
+ */
+function convertFirestoreDocument(doc: any): Article {
+  const fields = doc.fields || {};
+  
+  const getStringValue = (field: any): string => {
+    if (!field) return '';
+    return field.stringValue || field.integerValue?.toString() || '';
+  };
+
+  const getNumberValue = (field: any): number => {
+    if (!field) return 0;
+    if (field.integerValue) return parseInt(field.integerValue, 10);
+    if (field.doubleValue) return parseFloat(field.doubleValue);
+    return 0;
+  };
+
+  const getTimestampValue = (field: any): string => {
+    if (!field?.timestampValue) return '';
+    return field.timestampValue;
+  };
+
+  return {
+    id: doc.name?.split('/').pop() || '',
+    title: getStringValue(fields.title),
+    slug: getStringValue(fields.slug),
+    content: getStringValue(fields.content),
+    excerpt: getStringValue(fields.excerpt),
+    imageUrl: getStringValue(fields.imageUrl),
+    categoryId: getStringValue(fields.categoryId),
+    subcategoryId: getStringValue(fields.subcategoryId),
+    authorId: getStringValue(fields.authorId),
+    status: getStringValue(fields.status),
+    isLead: fields.isLead?.booleanValue === true,
+    isFeatured: fields.isFeatured?.booleanValue === true,
+    viewCount: getNumberValue(fields.viewCount),
+    publishedAt: getTimestampValue(fields.publishedAt),
+  };
 }
