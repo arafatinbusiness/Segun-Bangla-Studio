@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Music, Volume2, Play, Pause, Loader2 } from 'lucide-react';
+import { Music, Volume2, Play, Pause, Loader2, Disc3 } from 'lucide-react';
 import { useReelEditor } from '@/lib/reelContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -27,6 +27,7 @@ export default function MusicSelector() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingTrack, setLoadingTrack] = useState<string | null>(null);
   const [currentAudioId, setCurrentAudioId] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -58,9 +59,9 @@ export default function MusicSelector() {
 
   const handlePlayPreview = (track: MusicTrack, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent selecting when clicking play
-    
+
+    // If clicking the same track that's currently playing, toggle pause
     if (currentAudioId === track.id && audioRef.current) {
-      // Toggle play/pause for current track
       if (audioRef.current.paused) {
         audioRef.current.play();
         setPlaying(true);
@@ -71,32 +72,62 @@ export default function MusicSelector() {
       return;
     }
 
-    // Stop current audio
+    // Stop current audio if any
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
 
-    // Play new track
+    // Show loading state for this track
+    setLoadingTrack(track.id);
+    setPlaying(false);
+    setCurrentAudioId(null);
+
+    // Create and play new audio
     const audio = new Audio(track.file);
     audio.volume = 0.5;
+
+    // When audio data starts loading
+    audio.onloadstart = () => {
+      setLoadingTrack(track.id);
+    };
+
+    // When enough data is loaded to play
+    audio.oncanplay = () => {
+      setLoadingTrack(null);
+    };
+
+    // When playback starts
+    audio.onplay = () => {
+      setPlaying(true);
+      setCurrentAudioId(track.id);
+      setLoadingTrack(null);
+    };
+
+    // When playback ends
     audio.onended = () => {
       setPlaying(false);
       setCurrentAudioId(null);
+      setLoadingTrack(null);
     };
+
+    // On error
     audio.onerror = () => {
       console.error('Failed to play audio:', track.file);
       setPlaying(false);
       setCurrentAudioId(null);
+      setLoadingTrack(null);
     };
-    audio.play().then(() => {
-      setPlaying(true);
-      setCurrentAudioId(track.id);
-    }).catch((err) => {
+
+    // Start loading the audio
+    audio.load();
+    audio.play().catch((err) => {
       console.error('Audio play error:', err);
       setPlaying(false);
       setCurrentAudioId(null);
+      setLoadingTrack(null);
     });
+
     audioRef.current = audio;
   };
 
@@ -172,7 +203,8 @@ export default function MusicSelector() {
         {tracks.map((track) => {
           const isSelected = reel.musicId === track.id;
           const isPlaying = currentAudioId === track.id && playing;
-          
+          const isLoading = loadingTrack === track.id;
+
           return (
             <Card
               key={track.id}
@@ -180,7 +212,7 @@ export default function MusicSelector() {
                 isSelected
                   ? 'border-primary bg-primary/10'
                   : 'border-border bg-muted/30 hover:bg-muted/50'
-              }`}
+              } ${isPlaying ? 'ring-2 ring-primary/30' : ''}`}
               onClick={() => handleSelectMusic(track.id)}
             >
               <div className="flex items-start gap-2">
@@ -189,25 +221,54 @@ export default function MusicSelector() {
                   size="icon"
                   className="w-6 h-6 flex-shrink-0 mt-0.5"
                   onClick={(e) => handlePlayPreview(track, e)}
+                  disabled={isLoading}
                 >
-                  {isPlaying ? (
+                  {isLoading ? (
+                    <Loader2 className="w-3 h-3 text-primary animate-spin" />
+                  ) : isPlaying ? (
                     <Pause className="w-3 h-3 text-primary" />
                   ) : (
                     <Play className="w-3 h-3 text-primary" />
                   )}
                 </Button>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-foreground truncate">{track.name}</p>
-                  <p className="text-xs text-muted-foreground">{track.duration}s</p>
+                  <p className={`text-xs font-medium truncate ${isPlaying ? 'text-primary' : 'text-foreground'}`}>
+                    {track.name}
+                    {isPlaying && (
+                      <span className="ml-1 inline-flex">
+                        <span className="w-1 h-2 bg-primary rounded-full animate-bounce mx-[1px]" style={{ animationDelay: '0ms' }} />
+                        <span className="w-1 h-3 bg-primary rounded-full animate-bounce mx-[1px]" style={{ animationDelay: '150ms' }} />
+                        <span className="w-1 h-2 bg-primary rounded-full animate-bounce mx-[1px]" style={{ animationDelay: '300ms' }} />
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {isLoading ? 'Loading...' : `${track.duration}s`}
+                  </p>
                 </div>
-                {isSelected && (
+                {isSelected && !isPlaying && (
                   <Music className="w-3 h-3 mt-1 flex-shrink-0 text-primary" />
+                )}
+                {isPlaying && (
+                  <Disc3 className="w-3 h-3 mt-1 flex-shrink-0 text-primary animate-spin" />
                 )}
               </div>
             </Card>
           );
         })}
       </div>
+
+      {/* Now Playing Indicator */}
+      {currentAudioId && playing && (
+        <Card className="p-2 border-primary/50 bg-primary/5">
+          <div className="flex items-center gap-2">
+            <Disc3 className="w-3 h-3 text-primary animate-spin flex-shrink-0" />
+            <p className="text-xs text-primary font-medium truncate">
+              Now Playing: {tracks.find(t => t.id === currentAudioId)?.name || 'Unknown'}
+            </p>
+          </div>
+        </Card>
+      )}
 
       {/* Volume Control */}
       {reel.musicId && (
@@ -228,14 +289,14 @@ export default function MusicSelector() {
       )}
 
       {/* Current Selection Info */}
-      {currentTrack && (
+      {currentTrack && !playing && (
         <Card className="p-3 border-primary bg-primary/5">
           <p className="text-xs font-medium text-foreground mb-1">Selected</p>
           <p className="text-xs text-muted-foreground">{currentTrack.name}</p>
         </Card>
       )}
 
-      {!reel.musicId && (
+      {!reel.musicId && !currentAudioId && (
         <p className="text-xs text-muted-foreground text-center py-4">No music selected</p>
       )}
     </div>
