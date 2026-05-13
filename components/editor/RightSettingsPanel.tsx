@@ -120,55 +120,6 @@ export default function RightSettingsPanel({ onPreviewUpdate }: RightSettingsPan
             </CardContent>
           </Card>
 
-          {/* Duration */}
-          <Card className="border-border">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Duration</CardTitle>
-              <CardDescription className="text-xs">{reel.duration} seconds</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Slider
-                value={[reel.duration]}
-                onValueChange={handleDurationChange}
-                min={7}
-                max={30}
-                step={1}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                <span>7s</span>
-                <span>30s</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Details Start Time */}
-          <Card className="border-border">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Article Details Start</CardTitle>
-              <CardDescription className="text-xs">
-                Show article content after {reel.detailsStartTime} seconds (max 4 lines)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Slider
-                value={[reel.detailsStartTime]}
-                onValueChange={(value) => {
-                  dispatch({ type: 'UPDATE_DETAILS_START_TIME', payload: value[0] });
-                  onPreviewUpdate();
-                }}
-                min={3}
-                max={Math.max(reel.duration - 3, 3)}
-                step={1}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                <span>3s</span>
-                <span>{Math.max(reel.duration - 3, 3)}s</span>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Font Size Settings */}
           <Card className="border-border">
             <CardHeader className="pb-3">
@@ -217,6 +168,55 @@ export default function RightSettingsPanel({ onPreviewUpdate }: RightSettingsPan
                   <span>16px</span>
                   <span>72px</span>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Duration */}
+          <Card className="border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">Duration</CardTitle>
+              <CardDescription className="text-xs">{reel.duration} seconds</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Slider
+                value={[reel.duration]}
+                onValueChange={handleDurationChange}
+                min={7}
+                max={30}
+                step={1}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                <span>7s</span>
+                <span>30s</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Details Start Time */}
+          <Card className="border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">Article Details Start</CardTitle>
+              <CardDescription className="text-xs">
+                Show article content after {reel.detailsStartTime} seconds (max 4 lines)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Slider
+                value={[reel.detailsStartTime]}
+                onValueChange={(value) => {
+                  dispatch({ type: 'UPDATE_DETAILS_START_TIME', payload: value[0] });
+                  onPreviewUpdate();
+                }}
+                min={3}
+                max={Math.max(reel.duration - 3, 3)}
+                step={1}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                <span>3s</span>
+                <span>{Math.max(reel.duration - 3, 3)}s</span>
               </div>
             </CardContent>
           </Card>
