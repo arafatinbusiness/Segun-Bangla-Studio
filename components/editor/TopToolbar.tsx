@@ -341,8 +341,8 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             let cardFontSize: number;
             
             if (showDetails) {
-              // Show article content/description (max 4 lines)
-              cardText = article.content || article.excerpt || reel.subtitleText || reel.headlineText || 'Segun Bangla';
+              // Show article description (max 4 lines)
+              cardText = reel.description || article.excerpt || reel.subtitleText || reel.headlineText || 'Segun Bangla';
               cardFontSize = 40;
             } else {
               // Show per-image caption

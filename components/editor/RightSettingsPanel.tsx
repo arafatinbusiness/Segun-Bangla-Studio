@@ -97,6 +97,26 @@ export default function RightSettingsPanel({ onPreviewUpdate }: RightSettingsPan
                   className="text-sm"
                 />
               </div>
+
+              <div>
+                <Label htmlFor="description" className="text-xs mb-2 block">
+                  Description (shown after details start time)
+                </Label>
+                <textarea
+                  id="description"
+                  value={reel.description || ''}
+                  onChange={(e) => {
+                    dispatch({ type: 'UPDATE_DESCRIPTION', payload: e.target.value });
+                    onPreviewUpdate();
+                  }}
+                  placeholder="Enter article description that replaces caption after the details start time..."
+                  className="w-full min-h-[80px] text-sm bg-background border border-border rounded-md p-2 resize-none focus:outline-none focus:ring-1 focus:ring-primary"
+                  rows={3}
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  This text will appear in the bottom card after {reel.detailsStartTime} seconds (max 4 lines)
+                </p>
+              </div>
             </CardContent>
           </Card>
 

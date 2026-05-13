@@ -40,6 +40,7 @@ export interface ReelConfig {
   images: ReelImage[];
   headlineText: string;
   subtitleText?: string;
+  description?: string; // article description/content shown after detailsStartTime
   status: 'draft' | 'pending' | 'rendering' | 'completed' | 'failed';
   videoUrl?: string;
   renderJobId?: string;

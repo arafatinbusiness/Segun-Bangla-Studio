@@ -13,6 +13,7 @@ type ReelEditorAction =
   | { type: 'SET_REEL'; payload: ReelConfig }
   | { type: 'UPDATE_HEADLINE'; payload: string }
   | { type: 'UPDATE_SUBTITLE'; payload: string }
+  | { type: 'UPDATE_DESCRIPTION'; payload: string }
   | { type: 'UPDATE_TEMPLATE'; payload: TemplateType }
   | { type: 'UPDATE_DURATION'; payload: number }
   | { type: 'UPDATE_MUSIC'; payload: { musicId: string; volume: number } }
@@ -62,6 +63,18 @@ function reelReducer(state: ReelEditorState, action: ReelEditorAction): ReelEdit
           ? {
               ...state.reel,
               subtitleText: action.payload,
+              updatedAt: new Date().toISOString(),
+            }
+          : null,
+      };
+
+    case 'UPDATE_DESCRIPTION':
+      return {
+        ...state,
+        reel: state.reel
+          ? {
+              ...state.reel,
+              description: action.payload,
               updatedAt: new Date().toISOString(),
             }
           : null,
