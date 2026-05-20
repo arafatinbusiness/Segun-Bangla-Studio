@@ -6,6 +6,7 @@ import { Article } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { useReelEditor } from '@/lib/reelContext';
 import { getTemplate } from '@/lib/templates';
+import { preloadImage, isImageValid } from '@/lib/imageProxy';
 
 interface TopToolbarProps {
   article: Article;
@@ -107,20 +108,23 @@ export default function TopToolbar({ article }: TopToolbarProps) {
       
       showStatus('preparing', `Loading images & audio...${selectedMusicName ? ` (${selectedMusicName})` : ''}`, 10);
       
-      // Preload images
+      // Preload images using proxy to avoid CORS issues
       const loadedImages: HTMLImageElement[] = [];
       if (reel.images && reel.images.length > 0) {
         for (const imgData of reel.images) {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          await new Promise<void>((resolve) => {
-            img.onload = () => resolve();
-            img.onerror = () => resolve();
-            img.src = imgData.url;
-            setTimeout(() => resolve(), 3000);
-          });
-          loadedImages.push(img);
+          const img = await preloadImage(imgData.url);
+          if (img && isImageValid(img)) {
+            loadedImages.push(img);
+          } else {
+            console.warn(`[render] Image failed to load, skipping: ${imgData.url}`);
+          }
         }
+      }
+      
+      // If no images loaded successfully, show a warning but continue
+      if (loadedImages.length === 0 && reel.images.length > 0) {
+        showStatus('preparing', '⚠️ Images failed to load. Video will show text only.', 10);
+        await new Promise(resolve => setTimeout(resolve, 1500));
       }
 
       // Preload audio if music selected
@@ -249,24 +253,30 @@ export default function TopToolbar({ article }: TopToolbarProps) {
               ctx.translate(-xOffset, 0);
             }
             
-            // Draw image covering full canvas
-            const imgAspect = img.width / img.height;
-            const canvasAspect = 1080 / 1920;
-            let sx, sy, sw, sh;
-            
-            if (imgAspect > canvasAspect) {
-              sh = img.height;
-              sw = img.height * canvasAspect;
-              sx = (img.width - sw) / 2;
-              sy = 0;
-            } else {
-              sw = img.width;
-              sh = img.width / canvasAspect;
-              sx = 0;
-              sy = (img.height - sh) / 2;
+            // Draw image covering full canvas (with safety check for broken images)
+            if (isImageValid(img)) {
+              const imgAspect = img.width / img.height;
+              const canvasAspect = 1080 / 1920;
+              let sx, sy, sw, sh;
+              
+              if (imgAspect > canvasAspect) {
+                sh = img.height;
+                sw = img.height * canvasAspect;
+                sx = (img.width - sw) / 2;
+                sy = 0;
+              } else {
+                sw = img.width;
+                sh = img.width / canvasAspect;
+                sx = 0;
+                sy = (img.height - sh) / 2;
+              }
+              
+              try {
+                ctx.drawImage(img, sx, sy, sw, sh, 0, 0, 1080, 1920);
+              } catch (e) {
+                console.warn('[render] drawImage failed for full canvas:', e);
+              }
             }
-            
-            ctx.drawImage(img, sx, sy, sw, sh, 0, 0, 1080, 1920);
             ctx.restore();
             
             // Fade in/out at edges
@@ -298,8 +308,8 @@ export default function TopToolbar({ article }: TopToolbarProps) {
             ctx.rect(0, 0, 1080, imageAreaHeight);
             ctx.clip();
             
-            // Redraw image clipped to top area
-            if (img) {
+            // Redraw image clipped to top area (with safety check for broken images)
+            if (isImageValid(img)) {
               const canvasAspect = 1080 / imageAreaHeight;
               let sx, sy, sw, sh;
               if (img.width / img.height > canvasAspect) {
@@ -313,7 +323,11 @@ export default function TopToolbar({ article }: TopToolbarProps) {
                 sx = 0;
                 sy = (img.height - sh) / 2;
               }
-              ctx.drawImage(img, sx, sy, sw, sh, 0, 0, 1080, imageAreaHeight);
+              try {
+                ctx.drawImage(img, sx, sy, sw, sh, 0, 0, 1080, imageAreaHeight);
+              } catch (e) {
+                console.warn('[render] drawImage failed for clipped area:', e);
+              }
             }
             ctx.restore();
             

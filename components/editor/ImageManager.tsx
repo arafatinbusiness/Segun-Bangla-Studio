@@ -18,6 +18,7 @@ import {
 import { Slider } from '@/components/ui/slider';
 import { v4 as uuidv4 } from 'uuid';
 import { ReelImage } from '@/lib/types';
+import { getProxiedImageUrl } from '@/lib/imageProxy';
 
 export default function ImageManager() {
   const { state, dispatch } = useReelEditor();
@@ -114,14 +115,19 @@ export default function ImageManager() {
               {/* Image Preview */}
               <div className="aspect-video rounded-md overflow-hidden mb-2 bg-muted">
                 <img
-                  src={image.url}
+                  src={getProxiedImageUrl(image.url)}
                   alt={`Image ${index + 1}`}
                   className="w-full h-full object-cover"
+                  crossOrigin="anonymous"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                    (e.target as HTMLImageElement).parentElement!.style.display = 'flex';
-                    (e.target as HTMLImageElement).parentElement!.alignItems = 'center';
-                    (e.target as HTMLImageElement).parentElement!.justifyContent = 'center';
+                    const imgEl = e.target as HTMLImageElement;
+                    imgEl.style.display = 'none';
+                    const parent = imgEl.parentElement;
+                    if (parent) {
+                      parent.style.display = 'flex';
+                      parent.style.alignItems = 'center';
+                      parent.style.justifyContent = 'center';
+                    }
                   }}
                 />
                 <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useReelEditor } from '@/lib/reelContext';
 import { getTemplate } from '@/lib/templates';
+import { getProxiedImageUrl } from '@/lib/imageProxy';
 
 export default function PreviewPane() {
   const { state } = useReelEditor();
@@ -77,9 +78,10 @@ export default function PreviewPane() {
         >
           {firstImage ? (
             <img
-              src={firstImage.url}
+              src={getProxiedImageUrl(firstImage.url)}
               alt="Preview"
               className="w-full h-full object-cover"
+              crossOrigin="anonymous"
             />
           ) : (
             <div className="w-full h-full bg-muted flex items-center justify-center">
