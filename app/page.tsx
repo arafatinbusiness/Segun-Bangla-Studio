@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Film, Sparkles, Zap, Plus, Image, Type } from 'lucide-react';
+import { Film, Sparkles, Zap, Plus, Image, Type, UserSquare2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -47,8 +47,19 @@ export default function Home() {
               size="lg"
               className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
             >
-              <Sparkles className="w-5 h-5 mr-2" />
-              Create Your First Reel
+              <Film className="w-5 h-5 mr-2" />
+              Create Video Reel
+            </Button>
+          </Link>
+
+          <Link href="/photocard">
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-primary text-primary hover:bg-primary/10 px-8"
+            >
+              <UserSquare2 className="w-5 h-5 mr-2" />
+              Create Profile Card
             </Button>
           </Link>
           
@@ -117,18 +128,18 @@ export default function Home() {
         {/* Features */}
         <div className="grid md:grid-cols-3 gap-6 mt-16">
           <div className="p-6 bg-card rounded-lg border border-border">
-            <Zap className="w-8 h-8 text-accent mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">Lightning Fast</h3>
+            <Film className="w-8 h-8 text-accent mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">Video Reels</h3>
             <p className="text-sm text-muted-foreground">
-              Create professional reels in minutes, not hours.
+              Create professional 9:16 video reels with cinematic templates and music.
             </p>
           </div>
 
           <div className="p-6 bg-card rounded-lg border border-border">
-            <Film className="w-8 h-8 text-accent mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">Cinematic Quality</h3>
+            <UserSquare2 className="w-8 h-8 text-accent mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">Profile Cards</h3>
             <p className="text-sm text-muted-foreground">
-              Premium templates and animations optimized for social media.
+              Generate beautiful profile cards with Segun Bangla branding for social media.
             </p>
           </div>
 
@@ -136,7 +147,7 @@ export default function Home() {
             <Sparkles className="w-8 h-8 text-accent mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-foreground mb-2">Bangla Ready</h3>
             <p className="text-sm text-muted-foreground">
-              Full support for Bangla typography and content.
+              Full support for Bangla typography and professional newsroom quality output.
             </p>
           </div>
         </div>
