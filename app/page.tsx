@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Film, Sparkles, Zap, Plus, Image, Type, UserSquare2 } from 'lucide-react';
+import { Film, Sparkles, Zap, Plus, Image, Type, UserSquare2, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -59,7 +59,18 @@ export default function Home() {
               className="border-primary text-primary hover:bg-primary/10 px-8"
             >
               <UserSquare2 className="w-5 h-5 mr-2" />
-              Create Profile Card
+              Profile Card
+            </Button>
+          </Link>
+
+          <Link href="/social-card">
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-primary text-primary hover:bg-primary/10 px-8"
+            >
+              <Share2 className="w-5 h-5 mr-2" />
+              Social Card
             </Button>
           </Link>
           
@@ -140,6 +151,14 @@ export default function Home() {
             <h3 className="text-lg font-semibold text-foreground mb-2">Profile Cards</h3>
             <p className="text-sm text-muted-foreground">
               Generate beautiful profile cards with Segun Bangla branding for social media.
+            </p>
+          </div>
+
+          <div className="p-6 bg-card rounded-lg border border-border">
+            <Share2 className="w-8 h-8 text-accent mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">Social Cards</h3>
+            <p className="text-sm text-muted-foreground">
+              Create shareable news article cards with photo, title, and branding for Facebook/Instagram.
             </p>
           </div>
 

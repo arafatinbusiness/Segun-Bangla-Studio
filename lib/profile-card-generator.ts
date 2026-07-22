@@ -85,12 +85,12 @@ export const DEFAULT_COLORS_T2: ProfileCardColors = {
   quoteColor: '#000000',
   quoteSourceColor: '#444444',
   accentLineColor: '#000000',
-  brandBarTop: '#1A1A1A',
-  brandBarBottom: '#000000',
+  brandBarTop: '#8B0000',
+  brandBarBottom: '#6B0000',
   brandTextColor: '#FFFFFF',
   newsBadgeBg: '#E50000',
   newsBadgeText: '#FFFFFF',
-  taglineBarBg: '#074723',
+  taglineBarBg: '#004F35',
   taglineTextColor: '#FFFFFF',
   watermarkColor: '#000000',
   watermarkOpacity: 0.06,
@@ -559,16 +559,19 @@ async function renderTemplateMirrorQuote(
   }
 
   // ─── 9. Footer Architecture ────────────────────────────────────────────
-  // Tier 1: Solid Black Bar — "Segun Bangla" + red "NEWS" block
+  // Tier 1: Brand Bar — "Segun Bangla" + "NEWS" block
   const ftTopY = H - footerTotalH
   const ftBotY = ftTopY + footerTopBarH
 
-  // Black bar
-  ctx.fillStyle = '#000000'
+  // Brand top bar (using configurable colors like Template 1)
+  const bg = ctx.createLinearGradient(0, ftTopY, 0, ftTopY + footerTopBarH)
+  bg.addColorStop(0, C.brandBarTop)
+  bg.addColorStop(1, C.brandBarBottom)
+  ctx.fillStyle = bg
   ctx.fillRect(0, ftTopY, W, footerTopBarH)
 
   // "Segun Bangla" white text (left side)
-  ctx.fillStyle = '#FFFFFF'
+  ctx.fillStyle = C.brandTextColor
   ctx.font = `bold ${brandFS}px ${FONT}`
   ctx.textAlign = 'left'; ctx.textBaseline = 'middle'
   ctx.fillText('Segun Bangla', padX, ftTopY + footerTopBarH / 2)
@@ -584,16 +587,16 @@ async function renderTemplateMirrorQuote(
   const ny = ftTopY + Math.round((footerTopBarH - newsFS * 1.3) / 2)
   const nx = padX + segunW - npad
 
-  ctx.fillStyle = '#E50000'  // solid red
-  ctx.fillRect(nx, ny, nw + npad * 2, Math.round(newsFS * 1.3))
-  ctx.fillStyle = '#FFFFFF'
+  ctx.fillStyle = C.newsBadgeBg
+  ctx.fillRect(nx, ny, nw + npad * 2, Math.round(newsFS * 1.2))
+  ctx.fillStyle = C.newsBadgeText
   ctx.fillText(newsStr, nx + npad, ny + Math.round(newsFS * 0.15))
 
-  // Tier 2: Dark Green Bar — centered tagline
-  ctx.fillStyle = '#074723'
+  // Tier 2: Tagline Bar — centered tagline
+  ctx.fillStyle = C.taglineBarBg
   ctx.fillRect(0, ftBotY, W, footerBotBarH)
 
-  ctx.fillStyle = '#FFFFFF'
+  ctx.fillStyle = C.taglineTextColor
   ctx.font = `normal ${tagFS}px ${FONT}`
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
   ctx.fillText('সেগুন বাংলা • সত্যের সন্ধানে', W / 2, ftBotY + footerBotBarH / 2)

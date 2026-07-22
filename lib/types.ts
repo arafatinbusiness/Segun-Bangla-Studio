@@ -4,16 +4,37 @@ export interface Article {
   title: string;
   content: string;
   excerpt: string;
+  excerptColor?: string;
   imageUrl: string;
+  imageCaption?: string;
+  imageCaptionAlign?: string;
+  imageSize?: string;
+  imageFocus?: string;
+  source?: string;
+  reporterName?: string;
+  reporterImage?: string;
+  shoulder?: string;
+  shoulderColor?: string;
+  shoulderTextColor?: string;
+  shoulderFontSize?: string;
+  bulletPoints?: string[];
+  bulletColor?: string;
+  bulletFontSize?: string;
   categoryId: string;
+  categoryIds?: string[];
   subcategoryId?: string;
+  subcategoryIds?: string[];
   slug: string;
   publishedAt: string;
+  updatedAt?: string;
   authorId: string;
   status: string;
   isLead: boolean;
+  isSpecial?: boolean;
+  isSpecialOrder?: number;
   isFeatured: boolean;
   viewCount: number;
+  tags?: string[];
 }
 
 // Image in reel composition
