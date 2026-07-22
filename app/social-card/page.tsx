@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { ArrowLeft, Download, Loader2, ImagePlus, Facebook, Instagram, Video, Search, ExternalLink, ChevronDown, Palette } from 'lucide-react'
 import Link from 'next/link'
 import { generateAndDownloadSocialCard, type SocialCardFormat, type SocialCardColors } from '@/lib/social-card-generator'
+import { generateSocialCardGif, type GifConfig } from '@/lib/social-card-gif'
 import { collection, query, orderBy, limit, startAfter, getDocs, type DocumentSnapshot } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 
@@ -48,6 +49,7 @@ function SocialCardContent() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showColors, setShowColors] = useState(true)
   const [colors, setColors] = useState<SocialCardColors>({ ...DEFAULT_COLORS })
+  const [gifMode, setGifMode] = useState(false)
   const articleId = searchParams.get('article')
 
   const fetchArticles = useCallback(async (loadMore = false) => {
@@ -107,20 +109,45 @@ function SocialCardContent() {
     { key: 'footerText', label: 'ফুটার টেক্সট', desc: 'শিরোনাম ও CTA রঙ' },
   ]
 
-  const handleGenerate = useCallback(async () => {
+  const handleGenerate = useCallback(async (asGif = false) => {
     if (!title.trim()) { alert('দয়া করে শিরোনাম লিখুন'); return }
     if (!date.trim()) { alert('দয়া করে তারিখ লিখুন'); return }
     setGenerating(true)
+    const filename = `social-${title.trim().replace(/\s+/g, '-').substring(0, 40)}`
     try {
-      await generateAndDownloadSocialCard(
-        { title: title.trim(), date: date.trim(), imageUrl: imageUrl.trim() || undefined, colors },
-        `social-${title.trim().replace(/\s+/g, '-').substring(0, 40)}`,
-        format,
-        (msg) => setProgress(msg)
-      )
+      if (asGif) {
+        setProgress('GIF তৈরি হচ্ছে...')
+        const dims = { facebook: { w: 1080, h: 1350 }, square: { w: 1080, h: 1080 }, story: { w: 1080, h: 1920 }, passport: { w: 1080, h: 1350 } }
+        const d = dims[format]
+        const canvas = document.createElement('canvas')
+        canvas.width = d.w
+        canvas.height = d.h
+        const blob = await generateSocialCardGif(canvas, title.trim(), imageUrl.trim() || undefined, date.trim(), {
+          headerBg: colors.headerBg || '#8B5E3C',
+          headerText: colors.headerText || '#FFFFFF',
+          brandingStripBg: colors.brandingStripBg || '#5C3317',
+          footerBg: colors.footerBg || '#5C3317',
+          footerText: colors.footerText || '#FFFFFF',
+        })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${filename}.gif`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        setTimeout(() => URL.revokeObjectURL(url), 5000)
+      } else {
+        await generateAndDownloadSocialCard(
+          { title: title.trim(), date: date.trim(), imageUrl: imageUrl.trim() || undefined, colors },
+          filename,
+          format,
+          (msg) => setProgress(msg)
+        )
+      }
     } catch (error) {
       console.error('Error:', error)
-      alert('সোশ্যাল কার্ড তৈরি করতে ত্রুটি হয়েছে')
+      alert('কার্ড তৈরি করতে ত্রুটি হয়েছে')
     } finally { setGenerating(false); setProgress('') }
   }, [title, date, imageUrl, format, colors])
 
@@ -198,7 +225,7 @@ function SocialCardContent() {
     <div className="min-h-screen bg-background">
       <div className="border-b border-border bg-card">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
-          <Link href="/social-card" className="text-foreground hover:text-primary transition-colors"><ArrowLeft className="w-5 h-5" /></Link>
+          <button onClick={() => router.back()} className="text-foreground hover:text-primary transition-colors"><ArrowLeft className="w-5 h-5" /></button>
           <div><h1 className="text-lg font-bold text-foreground">Social Card Generator</h1><p className="text-xs text-muted-foreground">আর্টিকেল লোড হয়েছে — রং কাস্টমাইজ করে ডাউনলোড করুন</p></div>
         </div>
       </div>
@@ -243,9 +270,14 @@ function SocialCardContent() {
               <h2 className="text-base font-semibold text-foreground border-b border-border pb-2">ফরম্যাট</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">{formatOptions.map(opt => { const Icon = opt.icon; return (<button key={opt.key} type="button" onClick={() => setFormat(opt.key)} className={`p-3 rounded-lg border text-left transition-colors ${format === opt.key ? 'bg-primary/20 border-primary text-foreground' : 'bg-background border-border text-muted-foreground hover:bg-muted'}`}><Icon className="w-5 h-5 mb-1" /><div className="font-semibold text-sm">{opt.label}</div><div className="text-[10px] opacity-70">{opt.desc}</div></button>) })}</div>
             </div>
-            <button onClick={handleGenerate} disabled={generating || !title.trim() || !date.trim()} className="w-full h-12 text-base font-bold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-              {generating ? <><Loader2 className="w-5 h-5 animate-spin" /> {progress || 'তৈরি হচ্ছে...'}</> : <><Download className="w-5 h-5" /> সোশ্যাল কার্ড তৈরি ও ডাউনলোড</>}
-            </button>
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={() => handleGenerate(false)} disabled={generating || !title.trim() || !date.trim()} className="h-12 text-base font-bold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                {generating ? <><Loader2 className="w-5 h-5 animate-spin" /> {progress || 'তৈরি হচ্ছে...'}</> : <><Download className="w-5 h-5" /> PNG ডাউনলোড</>}
+              </button>
+              <button onClick={() => handleGenerate(true)} disabled={generating || !title.trim() || !date.trim()} className="h-12 text-base font-bold rounded-lg bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                {generating ? <><Loader2 className="w-5 h-5 animate-spin" /> {progress || 'তৈরি হচ্ছে...'}</> : <><ImagePlus className="w-5 h-5" /> GIF ডাউনলোড</>}
+              </button>
+            </div>
           </div>
 
           {/* Preview */}
