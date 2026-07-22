@@ -2,9 +2,9 @@
 
 import { useState, useCallback, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { ArrowLeft, Download, Loader2, ImagePlus, Facebook, Instagram, Video, Search, ExternalLink, ChevronDown } from 'lucide-react'
+import { ArrowLeft, Download, Loader2, ImagePlus, Facebook, Instagram, Video, Search, ExternalLink, ChevronDown, Palette } from 'lucide-react'
 import Link from 'next/link'
-import { generateAndDownloadSocialCard, type SocialCardFormat } from '@/lib/social-card-generator'
+import { generateAndDownloadSocialCard, type SocialCardFormat, type SocialCardColors } from '@/lib/social-card-generator'
 import { collection, query, orderBy, limit, startAfter, getDocs, type DocumentSnapshot } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 
@@ -18,6 +18,14 @@ interface ArticleSummary {
 }
 
 const PAGE_SIZE = 15
+
+const DEFAULT_COLORS: SocialCardColors = {
+  headerBg: '#8B5E3C',
+  headerText: '#FFFFFF',
+  brandingStripBg: '#5C3317',
+  footerBg: '#5C3317',
+  footerText: '#FFFFFF',
+}
 
 function SocialCardContent() {
   const searchParams = useSearchParams()
@@ -38,6 +46,8 @@ function SocialCardContent() {
   const [lastDoc, setLastDoc] = useState<DocumentSnapshot | null>(null)
   const [hasMore, setHasMore] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [showColors, setShowColors] = useState(true)
+  const [colors, setColors] = useState<SocialCardColors>({ ...DEFAULT_COLORS })
   const articleId = searchParams.get('article')
 
   const fetchArticles = useCallback(async (loadMore = false) => {
@@ -89,11 +99,12 @@ function SocialCardContent() {
     }
   }, [articleId])
 
-  const formatOptions: { key: SocialCardFormat; label: string; desc: string; icon: typeof Facebook }[] = [
-    { key: 'facebook', label: 'ফেসবুক', desc: '৪:৫ (১০৮০×১৩৫০)', icon: Facebook },
-    { key: 'square', label: 'স্কয়ার', desc: '১:১ (১০৮০×১০৮০)', icon: Instagram },
-    { key: 'story', label: 'স্টোরি', desc: '৯:১৬ (১০৮০×১৯২০)', icon: Video },
-    { key: 'passport', label: 'পাসপোর্ট', desc: 'প্রোফাইল ছবি', icon: ImagePlus },
+  const colorFields: { key: keyof SocialCardColors; label: string; desc: string }[] = [
+    { key: 'headerBg', label: 'হেডার ব্যাকগ্রাউন্ড', desc: 'উপরের বার' },
+    { key: 'headerText', label: 'হেডার টেক্সট', desc: 'Segun Bangla ও তারিখ' },
+    { key: 'brandingStripBg', label: 'মিড স্ট্রিপ', desc: 'লোগোর পটভূমি' },
+    { key: 'footerBg', label: 'ফুটার ব্যাকগ্রাউন্ড', desc: 'নিচের বড় অংশ' },
+    { key: 'footerText', label: 'ফুটার টেক্সট', desc: 'শিরোনাম ও CTA রঙ' },
   ]
 
   const handleGenerate = useCallback(async () => {
@@ -102,7 +113,7 @@ function SocialCardContent() {
     setGenerating(true)
     try {
       await generateAndDownloadSocialCard(
-        { title: title.trim(), date: date.trim(), imageUrl: imageUrl.trim() || undefined },
+        { title: title.trim(), date: date.trim(), imageUrl: imageUrl.trim() || undefined, colors },
         `social-${title.trim().replace(/\s+/g, '-').substring(0, 40)}`,
         format,
         (msg) => setProgress(msg)
@@ -111,7 +122,7 @@ function SocialCardContent() {
       console.error('Error:', error)
       alert('সোশ্যাল কার্ড তৈরি করতে ত্রুটি হয়েছে')
     } finally { setGenerating(false); setProgress('') }
-  }, [title, date, imageUrl, format])
+  }, [title, date, imageUrl, format, colors])
 
   const selectArticle = (article: ArticleSummary) => { router.push(`/social-card?article=${article.id}`) }
 
@@ -186,7 +197,10 @@ function SocialCardContent() {
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b border-border bg-card">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4"><Link href="/social-card" className="text-foreground hover:text-primary transition-colors"><ArrowLeft className="w-5 h-5" /></Link><div><h1 className="text-lg font-bold text-foreground">Social Card Generator</h1><p className="text-xs text-muted-foreground">আর্টিকেল লোড হয়েছে — নিচে এডিট করে কাস্টমাইজ করুন</p></div></div>
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+          <Link href="/social-card" className="text-foreground hover:text-primary transition-colors"><ArrowLeft className="w-5 h-5" /></Link>
+          <div><h1 className="text-lg font-bold text-foreground">Social Card Generator</h1><p className="text-xs text-muted-foreground">আর্টিকেল লোড হয়েছে — রং কাস্টমাইজ করে ডাউনলোড করুন</p></div>
+        </div>
       </div>
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -197,6 +211,34 @@ function SocialCardContent() {
               <div><label className="block text-sm font-medium text-foreground mb-1">তারিখ *</label><input value={date} onChange={e => setDate(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary" /></div>
               <div><label className="block text-sm font-medium text-foreground mb-1">ছবির URL</label><div className="flex gap-2"><input value={imageUrl} onChange={e => setImageUrl(e.target.value)} className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary" />{imageUrl && <div className="w-12 h-12 rounded-lg overflow-hidden border border-border shrink-0"><img src={imageUrl} alt="" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} /></div>}</div></div>
             </div>
+
+            {/* Color Customization */}
+            <div className="bg-card border border-border rounded-lg p-5 space-y-3">
+              <button onClick={() => setShowColors(!showColors)} className="w-full flex items-center justify-between">
+                <h2 className="text-base font-semibold text-foreground flex items-center gap-2"><Palette className="w-4 h-4" /> রঙ কাস্টমাইজ করুন</h2>
+                <span className="text-sm text-muted-foreground">{showColors ? '▲' : '▼'}</span>
+              </button>
+              {showColors && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+                  {colorFields.map(field => {
+                    const colorKey = field.key as keyof typeof colors
+                    return (
+                      <div key={field.key} className="flex items-center gap-2">
+                        <input type="color" value={(colors[colorKey] as string) || (DEFAULT_COLORS[colorKey] as string) || '#000000'} onChange={e => setColors(prev => ({ ...prev, [colorKey]: e.target.value }))} className="w-8 h-8 rounded cursor-pointer border border-border" />
+                        <div className="flex-1 min-w-0">
+                          <label className="block text-[10px] text-muted-foreground truncate">{field.label}</label>
+                          <span className="block text-[9px] text-muted-foreground truncate font-mono">{(colors[colorKey] as string) || (DEFAULT_COLORS[colorKey] as string)}</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                  <button onClick={() => setColors({ ...DEFAULT_COLORS })} className="col-span-full text-xs text-primary hover:text-primary/80 text-center py-2 border border-dashed border-border rounded-lg">
+                    ডিফল্ট রঙে রিসেট করুন
+                  </button>
+                </div>
+              )}
+            </div>
+
             <div className="bg-card border border-border rounded-lg p-5 space-y-3">
               <h2 className="text-base font-semibold text-foreground border-b border-border pb-2">ফরম্যাট</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">{formatOptions.map(opt => { const Icon = opt.icon; return (<button key={opt.key} type="button" onClick={() => setFormat(opt.key)} className={`p-3 rounded-lg border text-left transition-colors ${format === opt.key ? 'bg-primary/20 border-primary text-foreground' : 'bg-background border-border text-muted-foreground hover:bg-muted'}`}><Icon className="w-5 h-5 mb-1" /><div className="font-semibold text-sm">{opt.label}</div><div className="text-[10px] opacity-70">{opt.desc}</div></button>) })}</div>
@@ -205,14 +247,24 @@ function SocialCardContent() {
               {generating ? <><Loader2 className="w-5 h-5 animate-spin" /> {progress || 'তৈরি হচ্ছে...'}</> : <><Download className="w-5 h-5" /> সোশ্যাল কার্ড তৈরি ও ডাউনলোড</>}
             </button>
           </div>
+
+          {/* Preview */}
           <div className="space-y-4">
             <div className="bg-card border border-border rounded-lg p-5">
               <h2 className="text-base font-semibold text-foreground mb-3">প্রিভিউ</h2>
-              <div className="rounded-lg overflow-hidden border mx-auto relative bg-[#5C3317]" style={{ aspectRatio: format === 'facebook' ? '4/5' : format === 'story' ? '9/16' : '1/1', maxWidth: '260px' }}>
-                <div className="h-[4%] bg-[#8B5E3C] flex items-center px-2"><span className="text-white text-[6px] font-bold">Segun Bangla</span><span className="text-white text-[5px] ml-auto">{date || 'তারিখ'}</span></div>
+              <div className="rounded-lg overflow-hidden border mx-auto relative" style={{ aspectRatio: format === 'facebook' ? '4/5' : format === 'story' ? '9/16' : '1/1', maxWidth: '260px' }}>
+                <div className="h-[4%] flex items-center px-2" style={{ backgroundColor: colors.headerBg || '#8B5E3C' }}>
+                  <span className="text-[6px] font-bold" style={{ color: colors.headerText || '#FFFFFF' }}>Segun Bangla</span>
+                  <span className="text-[5px] ml-auto" style={{ color: colors.headerText || '#FFFFFF' }}>{date || 'তারিখ'}</span>
+                </div>
                 <div className="h-[55%] bg-gray-200 flex items-center justify-center overflow-hidden">{imageUrl ? <img src={imageUrl} alt="" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).src = '' }} /> : <ImagePlus className="w-8 h-8 text-gray-400" />}</div>
-                <div className="h-[5%] bg-[#5C3317] flex items-center justify-center"><span className="text-white text-[5px] font-bold">সেগুন বাংলা</span></div>
-                <div className="h-[36%] bg-[#5C3317] flex flex-col items-center justify-center p-2 text-center"><p className="text-white text-[7px] font-bold leading-tight">{title || 'শিরোনাম'}</p><div className="mt-auto"><span className="text-white/80 text-[5px]">« বিস্তারিত কমেন্টে »</span><div className="flex justify-between mt-1"><span className="text-white/30 text-[4px]">www.segunbangla.com</span><span className="text-white/30 text-[4px]">সেগুন বাংলা</span></div></div></div>
+                <div className="h-[5%] flex items-center justify-center" style={{ backgroundColor: colors.brandingStripBg || '#5C3317' }}>
+                  <span className="text-white text-[5px] font-bold">লোগো</span>
+                </div>
+                <div className="h-[36%] flex flex-col items-center justify-center p-2 text-center" style={{ backgroundColor: colors.footerBg || '#5C3317' }}>
+                  <p className="text-[7px] font-bold leading-tight" style={{ color: colors.footerText || '#FFFFFF' }}>{title || 'শিরোনাম'}</p>
+                  <div className="mt-auto"><span className="text-[5px]" style={{ color: colors.footerText ? colors.footerText + 'CC' : 'rgba(255,255,255,0.8)' }}>« বিস্তারিত কমেন্টে »</span></div>
+                </div>
               </div>
             </div>
           </div>
@@ -221,6 +273,13 @@ function SocialCardContent() {
     </div>
   )
 }
+
+const formatOptions: { key: SocialCardFormat; label: string; desc: string; icon: typeof Facebook }[] = [
+  { key: 'facebook', label: 'ফেসবুক', desc: '৪:৫ (১০৮০×১৩৫০)', icon: Facebook },
+  { key: 'square', label: 'স্কয়ার', desc: '১:১ (১০৮০×১০৮০)', icon: Instagram },
+  { key: 'story', label: 'স্টোরি', desc: '৯:১৬ (১০৮০×১৯২০)', icon: Video },
+  { key: 'passport', label: 'পাসপোর্ট', desc: 'প্রোফাইল ছবি', icon: ImagePlus },
+]
 
 export default function SocialCardPage() {
   return (

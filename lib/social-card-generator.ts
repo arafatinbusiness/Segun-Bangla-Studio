@@ -29,10 +29,20 @@ const FORMAT_DIMENSIONS: Record<SocialCardFormat, CardDimensions> = {
   passport: { width: 1080, height: 1350 },
 }
 
+export interface SocialCardColors {
+  headerBg?: string       // Brand bar background (default '#8B5E3C')
+  headerText?: string     // Brand bar text/date (default '#FFFFFF')
+  brandingStripBg?: string // Mid strip background (default '#5C3317')
+  footerBg?: string       // Footer background (default '#5C3317')
+  footerText?: string     // Title & CTA text color (default '#FFFFFF')
+  ctaText?: string        // CTA text underline color (default 'rgba(255,255,255,0.4)')
+}
+
 interface SocialCardData {
   title: string
   date: string
   imageUrl?: string
+  colors?: SocialCardColors
 }
 
 /**
@@ -125,19 +135,21 @@ export async function generateAndDownloadSocialCard(
   canvas.height = H
   const ctx = canvas.getContext('2d')!
 
-  // ─── 1. Draw Header Strip (Teak wood background) ────────────────────────
-  ctx.fillStyle = '#8B5E3C'
+  const C = data.colors || {}
+
+  // ─── 1. Draw Header Strip ───────────────────────────────────────────────
+  ctx.fillStyle = C.headerBg || '#8B5E3C'
   ctx.fillRect(0, 0, W, headerHeight)
 
   // Brand name "Segun Bangla" - left aligned
-  ctx.fillStyle = '#FFFFFF'
+  ctx.fillStyle = C.headerText || '#FFFFFF'
   ctx.font = `bold ${brandFontSize}px "Hind Siliguri", "Noto Sans Bengali", Arial, sans-serif`
   ctx.textAlign = 'left'
   ctx.textBaseline = 'middle'
   ctx.fillText('Segun Bangla', paddingX, headerHeight / 2)
 
   // Date - right aligned
-  ctx.fillStyle = '#FFFFFF'
+  ctx.fillStyle = C.headerText || '#FFFFFF'
   ctx.font = `${dateFontSize}px "Hind Siliguri", "Noto Sans Bengali", Arial, sans-serif`
   ctx.textAlign = 'right'
   ctx.fillText(data.date, W - paddingX, headerHeight / 2)
@@ -249,7 +261,7 @@ export async function generateAndDownloadSocialCard(
 
   // ─── 3. Branding Strip (between image and footer) ───────────────────────
   const brandingStripTop = headerHeight + imageHeight
-  ctx.fillStyle = '#5C3317'
+  ctx.fillStyle = C.brandingStripBg || '#5C3317'
   ctx.fillRect(0, brandingStripTop, W, brandingStripHeight)
 
   // Load and draw logo centered in the branding strip
@@ -268,10 +280,11 @@ export async function generateAndDownloadSocialCard(
     ctx.drawImage(logoImg, stripLogoX, stripLogoY, stripLogoWidth, stripLogoHeight)
   }
 
-  // ─── 4. Draw Footer (Solid Teak Wood) ───────────────────────────────────
+  // ─── 4. Draw Footer ─────────────────────────────────────────────────────
   const footerTop = brandingStripTop + brandingStripHeight
+  const titleColor = C.footerText || '#FFFFFF'
 
-  ctx.fillStyle = '#5C3317'
+  ctx.fillStyle = C.footerBg || '#5C3317'
   ctx.fillRect(0, footerTop, W, footerHeight)
 
   // Title area - centered in the footer (leaving space for CTA at bottom)
@@ -294,7 +307,7 @@ export async function generateAndDownloadSocialCard(
     titleAreaHeight,
     Math.round(titleFontSize * 1.4),
     titleFontSize,
-    '#FFFFFF'
+    titleColor
   )
 
   // Reset shadow
@@ -307,7 +320,7 @@ export async function generateAndDownloadSocialCard(
   const ctaText = 'বিস্তারিত কমেন্টে'
   const ctaY = footerTop + footerHeight - Math.round(H * 0.035) - ctaFontSize
 
-  ctx.fillStyle = 'rgba(255,255,255,0.9)'
+  ctx.fillStyle = titleColor === '#FFFFFF' ? 'rgba(255,255,255,0.9)' : titleColor + 'E6'
   ctx.font = `${ctaFontSize}px "Hind Siliguri", "Noto Sans Bengali", Arial, sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'bottom'
