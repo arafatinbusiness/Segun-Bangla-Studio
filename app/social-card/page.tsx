@@ -291,7 +291,7 @@ function SocialCardContent() {
                 </div>
                 <div className="h-[55%] bg-gray-200 flex items-center justify-center overflow-hidden">{imageUrl ? <img src={imageUrl} alt="" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).src = '' }} /> : <ImagePlus className="w-8 h-8 text-gray-400" />}</div>
                 <div className="h-[5%] flex items-center justify-center" style={{ backgroundColor: colors.brandingStripBg || '#5C3317' }}>
-                  <span className="text-white text-[5px] font-bold">লোগো</span>
+                  <img src="/favicon.png" alt="" className="h-[70%] w-auto object-contain" />
                 </div>
                 <div className="h-[36%] flex flex-col items-center justify-center p-2 text-center" style={{ backgroundColor: colors.footerBg || '#5C3317' }}>
                   <p className="text-[7px] font-bold leading-tight" style={{ color: colors.footerText || '#FFFFFF' }}>{title || 'শিরোনাম'}</p>

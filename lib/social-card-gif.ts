@@ -65,13 +65,17 @@ export async function generateSocialCardGif(
   offscreen.height = H
   const ctx = offscreen.getContext('2d')!
 
-  // Pre-load image
+  // Pre-load image and icon
   let img: HTMLImageElement | null = null
+  let iconImg: HTMLImageElement | null = null
   if (imageUrl) {
     try {
       img = await loadImage(imageUrl)
     } catch {}
   }
+  try {
+    iconImg = await loadImage('/favicon.png')
+  } catch {}
 
   // Create GIF encoder
   const gif = new GIF({
@@ -125,14 +129,19 @@ export async function generateSocialCardGif(
       ctx.fillRect(0, imageTop, W, imageHeight)
     }
 
-    // Branding strip
+    // Branding strip with icon
+    const brandingStripTop = imageTop + imageHeight
     ctx.fillStyle = colors.brandingStripBg
-    ctx.fillRect(0, imageTop + imageHeight, W, brandingStripHeight)
-    ctx.fillStyle = '#FFFFFF'
-    ctx.font = `bold ${Math.round(brandFontSize * 0.7)}px "Hind Siliguri", "Noto Sans Bengali", Arial, sans-serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText('সেগুন বাংলা', W / 2, imageTop + imageHeight + brandingStripHeight / 2)
+    ctx.fillRect(0, brandingStripTop, W, brandingStripHeight)
+
+    // Draw favicon icon centered in the branding strip (pre-loaded)
+    if (iconImg) {
+      const iconHeight = Math.round(brandingStripHeight * 0.7)
+      const iconWidth = Math.round(iconHeight * (iconImg.naturalWidth / iconImg.naturalHeight))
+      const iconX = Math.round((W - iconWidth) / 2)
+      const iconY = Math.round(brandingStripTop + (brandingStripHeight - iconHeight) / 2)
+      ctx.drawImage(iconImg, iconX, iconY, iconWidth, iconHeight)
+    }
 
     // Footer
     const footerTop = imageTop + imageHeight + brandingStripHeight
