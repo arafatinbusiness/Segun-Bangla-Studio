@@ -264,12 +264,12 @@ export async function generateAndDownloadSocialCard(
   ctx.fillStyle = C.brandingStripBg || '#5C3317'
   ctx.fillRect(0, brandingStripTop, W, brandingStripHeight)
 
-  // Load and draw logo centered in the branding strip
+  // Load and draw icon (favicon) centered in the branding strip
   let logoImg: HTMLImageElement | null = null
   try {
-    logoImg = await loadImage('/logo.png')
+    logoImg = await loadImage('/favicon.png')
   } catch {
-    // Logo not available
+    // Icon not available
   }
 
   if (logoImg) {
