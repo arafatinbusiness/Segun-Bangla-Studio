@@ -284,16 +284,27 @@ function SocialCardContent() {
           <div className="space-y-4">
             <div className="bg-card border border-border rounded-lg p-5">
               <h2 className="text-base font-semibold text-foreground mb-3">প্রিভিউ</h2>
-              <div className="rounded-lg overflow-hidden border mx-auto relative" style={{ aspectRatio: format === 'facebook' ? '4/5' : format === 'story' ? '9/16' : '1/1', maxWidth: '260px' }}>
+              <div className="rounded-lg overflow-visible border mx-auto relative" style={{ aspectRatio: format === 'facebook' ? '4/5' : format === 'story' ? '9/16' : '1/1', maxWidth: '260px' }}>
                 <div className="h-[4%] flex items-center px-2" style={{ backgroundColor: colors.headerBg || '#8B5E3C' }}>
                   <span className="text-[6px] font-bold" style={{ color: colors.headerText || '#FFFFFF' }}>Segun Bangla</span>
                   <span className="text-[5px] ml-auto" style={{ color: colors.headerText || '#FFFFFF' }}>{date || 'তারিখ'}</span>
                 </div>
-                <div className="h-[55%] bg-gray-200 flex items-center justify-center overflow-hidden">{imageUrl ? <img src={imageUrl} alt="" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).src = '' }} /> : <ImagePlus className="w-8 h-8 text-gray-400" />}</div>
+                <div className="h-[55%] bg-gray-200 flex items-center justify-center overflow-hidden relative" style={{ zIndex: 0 }}>
+                  {imageUrl ? <img src={imageUrl} alt="" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).src = '' }} /> : <ImagePlus className="w-8 h-8 text-gray-400" />}
+                </div>
+                {/* Overlapping icon — between image and footer, on top of both */}
+                <div className="absolute flex items-center justify-center" style={{
+                  height: '9%',
+                  width: 'auto',
+                  top: '55%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 10,
+                }}>
+                  <img src="/favicon.png" alt="" className="h-full w-auto object-contain" />
+                </div>
                 <div className="h-[36%] flex flex-col items-center justify-center p-2 text-center relative" style={{ backgroundColor: colors.footerBg || '#5C3317' }}>
-                  {/* Overlapping icon — half on image, half on footer */}
-                  <img src="/favicon.png" alt="" className="absolute w-auto z-10" style={{ height: '9%', top: '-4.5%', left: '50%', transform: 'translateX(-50%)', objectFit: 'contain' }} />
-                  <p className="text-[7px] font-bold leading-tight" style={{ color: colors.footerText || '#FFFFFF' }}>{title || 'শিরোনাম'}</p>
+                  <p className="text-[7px] font-bold leading-tight mt-[5%]" style={{ color: colors.footerText || '#FFFFFF' }}>{title || 'শিরোনাম'}</p>
                   <div className="mt-auto"><span className="text-[5px]" style={{ color: colors.footerText ? colors.footerText + 'CC' : 'rgba(255,255,255,0.8)' }}>« বিস্তারিত কমেন্টে »</span></div>
                 </div>
               </div>
