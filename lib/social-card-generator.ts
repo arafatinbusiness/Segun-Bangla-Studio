@@ -259,12 +259,9 @@ export async function generateAndDownloadSocialCard(
     ctx.fillText('সেগুন বাংলা', W / 2, imageTop + imageHeight / 2)
   }
 
-  // ─── 3. Branding Strip (between image and footer) ───────────────────────
-  const brandingStripTop = headerHeight + imageHeight
-  ctx.fillStyle = C.brandingStripBg || '#5C3317'
-  ctx.fillRect(0, brandingStripTop, W, brandingStripHeight)
-
-  // Load and draw icon (favicon) centered in the branding strip
+  // ─── 3. Draw overlapping icon at boundary between image and footer ──────
+  // The icon sits half on the image area bottom, half on the footer top
+  const imageBottom = headerHeight + imageHeight
   let logoImg: HTMLImageElement | null = null
   try {
     logoImg = await loadImage('/favicon.png')
@@ -273,15 +270,15 @@ export async function generateAndDownloadSocialCard(
   }
 
   if (logoImg) {
-    const stripLogoHeight = Math.round(brandingStripHeight * 0.7)
-    const stripLogoWidth = Math.round(stripLogoHeight * (logoImg.naturalWidth / logoImg.naturalHeight))
-    const stripLogoX = Math.round((W - stripLogoWidth) / 2)
-    const stripLogoY = Math.round(brandingStripTop + (brandingStripHeight - stripLogoHeight) / 2)
-    ctx.drawImage(logoImg, stripLogoX, stripLogoY, stripLogoWidth, stripLogoHeight)
+    const overlapIconSize = Math.round(H * 0.065) // Slightly larger icon for overlap effect
+    const overlapIconWidth = Math.round(overlapIconSize * (logoImg.naturalWidth / logoImg.naturalHeight))
+    const overlapIconX = Math.round((W - overlapIconWidth) / 2)
+    const overlapIconY = Math.round(imageBottom - overlapIconSize * 0.5) // Half above, half below boundary
+    ctx.drawImage(logoImg, overlapIconX, overlapIconY, overlapIconWidth, overlapIconSize)
   }
 
-  // ─── 4. Draw Footer ─────────────────────────────────────────────────────
-  const footerTop = brandingStripTop + brandingStripHeight
+  // ─── 4. Draw Footer (starts at image bottom, no branding strip in between) ──
+  const footerTop = imageBottom
   const titleColor = C.footerText || '#FFFFFF'
 
   ctx.fillStyle = C.footerBg || '#5C3317'

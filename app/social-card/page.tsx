@@ -290,10 +290,9 @@ function SocialCardContent() {
                   <span className="text-[5px] ml-auto" style={{ color: colors.headerText || '#FFFFFF' }}>{date || 'তারিখ'}</span>
                 </div>
                 <div className="h-[55%] bg-gray-200 flex items-center justify-center overflow-hidden">{imageUrl ? <img src={imageUrl} alt="" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).src = '' }} /> : <ImagePlus className="w-8 h-8 text-gray-400" />}</div>
-                <div className="h-[5%] flex items-center justify-center" style={{ backgroundColor: colors.brandingStripBg || '#5C3317' }}>
-                  <img src="/favicon.png" alt="" className="h-[70%] w-auto object-contain" />
-                </div>
-                <div className="h-[36%] flex flex-col items-center justify-center p-2 text-center" style={{ backgroundColor: colors.footerBg || '#5C3317' }}>
+                <div className="h-[36%] flex flex-col items-center justify-center p-2 text-center relative" style={{ backgroundColor: colors.footerBg || '#5C3317' }}>
+                  {/* Overlapping icon — half on image, half on footer */}
+                  <img src="/favicon.png" alt="" className="absolute w-auto z-10" style={{ height: '9%', top: '-4.5%', left: '50%', transform: 'translateX(-50%)', objectFit: 'contain' }} />
                   <p className="text-[7px] font-bold leading-tight" style={{ color: colors.footerText || '#FFFFFF' }}>{title || 'শিরোনাম'}</p>
                   <div className="mt-auto"><span className="text-[5px]" style={{ color: colors.footerText ? colors.footerText + 'CC' : 'rgba(255,255,255,0.8)' }}>« বিস্তারিত কমেন্টে »</span></div>
                 </div>

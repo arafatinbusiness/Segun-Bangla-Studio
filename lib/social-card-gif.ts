@@ -129,22 +129,17 @@ export async function generateSocialCardGif(
       ctx.fillRect(0, imageTop, W, imageHeight)
     }
 
-    // Branding strip with icon
-    const brandingStripTop = imageTop + imageHeight
-    ctx.fillStyle = colors.brandingStripBg
-    ctx.fillRect(0, brandingStripTop, W, brandingStripHeight)
-
-    // Draw favicon icon centered in the branding strip (pre-loaded)
+    // Draw overlapping icon at boundary between image and footer
     if (iconImg) {
-      const iconHeight = Math.round(brandingStripHeight * 0.7)
-      const iconWidth = Math.round(iconHeight * (iconImg.naturalWidth / iconImg.naturalHeight))
-      const iconX = Math.round((W - iconWidth) / 2)
-      const iconY = Math.round(brandingStripTop + (brandingStripHeight - iconHeight) / 2)
-      ctx.drawImage(iconImg, iconX, iconY, iconWidth, iconHeight)
+      const overlapIconSize = Math.round(H * 0.065)
+      const overlapIconWidth = Math.round(overlapIconSize * (iconImg.naturalWidth / iconImg.naturalHeight))
+      const overlapIconX = Math.round((W - overlapIconWidth) / 2)
+      const overlapIconY = Math.round(imageTop + imageHeight - overlapIconSize * 0.5)
+      ctx.drawImage(iconImg, overlapIconX, overlapIconY, overlapIconWidth, overlapIconSize)
     }
 
-    // Footer
-    const footerTop = imageTop + imageHeight + brandingStripHeight
+    // Footer (no separate branding strip — icon overlaps)
+    const footerTop = imageTop + imageHeight
     ctx.fillStyle = colors.footerBg
     ctx.fillRect(0, footerTop, W, footerHeight)
 
