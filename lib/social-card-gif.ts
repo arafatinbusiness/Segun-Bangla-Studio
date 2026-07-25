@@ -129,16 +129,7 @@ export async function generateSocialCardGif(
       ctx.fillRect(0, imageTop, W, imageHeight)
     }
 
-    // Draw overlapping icon at boundary between image and footer
-    if (iconImg) {
-      const overlapIconSize = Math.round(H * 0.065)
-      const overlapIconWidth = Math.round(overlapIconSize * (iconImg.naturalWidth / iconImg.naturalHeight))
-      const overlapIconX = Math.round((W - overlapIconWidth) / 2)
-      const overlapIconY = Math.round(imageTop + imageHeight - overlapIconSize * 0.5)
-      ctx.drawImage(iconImg, overlapIconX, overlapIconY, overlapIconWidth, overlapIconSize)
-    }
-
-    // Footer (no separate branding strip — icon overlaps)
+    // Footer (draw this first — icon will go on top)
     const footerTop = imageTop + imageHeight
     ctx.fillStyle = colors.footerBg
     ctx.fillRect(0, footerTop, W, footerHeight)
@@ -193,6 +184,15 @@ export async function generateSocialCardGif(
     ctx.fillText('www.segunbangla.com', paddingX, wmY)
     ctx.textAlign = 'right'
     ctx.fillText('সেগুন বাংলা', W - paddingX, wmY)
+
+    // Draw overlapping icon ON TOP of footer (after everything else)
+    if (iconImg) {
+      const overlapIconSize = Math.round(H * 0.065)
+      const overlapIconWidth = Math.round(overlapIconSize * (iconImg.naturalWidth / iconImg.naturalHeight))
+      const overlapIconX = Math.round((W - overlapIconWidth) / 2)
+      const overlapIconY = Math.round(imageTop + imageHeight - overlapIconSize * 0.5)
+      ctx.drawImage(iconImg, overlapIconX, overlapIconY, overlapIconWidth, overlapIconSize)
+    }
   }
 
   // Generate all frames

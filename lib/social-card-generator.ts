@@ -259,25 +259,8 @@ export async function generateAndDownloadSocialCard(
     ctx.fillText('সেগুন বাংলা', W / 2, imageTop + imageHeight / 2)
   }
 
-  // ─── 3. Draw overlapping icon at boundary between image and footer ──────
-  // The icon sits half on the image area bottom, half on the footer top
+  // ─── 3. Draw Footer (starts at image bottom, no branding strip) ──────────
   const imageBottom = headerHeight + imageHeight
-  let logoImg: HTMLImageElement | null = null
-  try {
-    logoImg = await loadImage('/favicon.png')
-  } catch {
-    // Icon not available
-  }
-
-  if (logoImg) {
-    const overlapIconSize = Math.round(H * 0.065) // Slightly larger icon for overlap effect
-    const overlapIconWidth = Math.round(overlapIconSize * (logoImg.naturalWidth / logoImg.naturalHeight))
-    const overlapIconX = Math.round((W - overlapIconWidth) / 2)
-    const overlapIconY = Math.round(imageBottom - overlapIconSize * 0.5) // Half above, half below boundary
-    ctx.drawImage(logoImg, overlapIconX, overlapIconY, overlapIconWidth, overlapIconSize)
-  }
-
-  // ─── 4. Draw Footer (starts at image bottom, no branding strip in between) ──
   const footerTop = imageBottom
   const titleColor = C.footerText || '#FFFFFF'
 
@@ -351,6 +334,22 @@ export async function generateAndDownloadSocialCard(
   // Right: brand name in Bangla
   ctx.textAlign = 'right'
   ctx.fillText('সেগুন বাংলা', W - paddingX, watermarkY)
+
+  // ─── 7. Draw overlapping icon ON TOP of footer (after footer is rendered) ─
+  let logoImg: HTMLImageElement | null = null
+  try {
+    logoImg = await loadImage('/favicon.png')
+  } catch {
+    // Icon not available
+  }
+
+  if (logoImg) {
+    const overlapIconSize = Math.round(H * 0.065)
+    const overlapIconWidth = Math.round(overlapIconSize * (logoImg.naturalWidth / logoImg.naturalHeight))
+    const overlapIconX = Math.round((W - overlapIconWidth) / 2)
+    const overlapIconY = Math.round(imageBottom - overlapIconSize * 0.5)
+    ctx.drawImage(logoImg, overlapIconX, overlapIconY, overlapIconWidth, overlapIconSize)
+  }
 
   // ─── Convert to PNG and open in new tab ─────────────────────────────────
   onProgress?.('ছবি তৈরি হচ্ছে...')
